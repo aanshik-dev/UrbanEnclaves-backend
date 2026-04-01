@@ -1,6 +1,6 @@
 package com.RealState.Project.Entity;
 
-import com.RealEstate.realEstate.Enums.Status;
+import com.RealState.Project.Entity.Type.Status;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,14 +15,12 @@ import java.time.LocalDate;
 @ToString
 public class Agent{
     @Id
-   // @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="serial_no")
-    private int sno;   // hidden
+    private Long id;
 
-    @OneToOne(cascade = CascadeType.PERSIST, optional = false,orphanRemoval = true)
+    @OneToOne
     @MapsId
     @JoinColumn(name="agent_id")
-    private User aid;
+    private User user;
 
     @Column(nullable = false)
     private float commissionRate;

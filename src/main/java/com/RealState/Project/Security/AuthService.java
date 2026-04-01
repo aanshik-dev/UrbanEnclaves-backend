@@ -1,29 +1,20 @@
 package com.RealState.Project.Security;
 
-import com.RealState.Project.DTO.*;
-import com.RealState.Project.Entity.EmailOtp;
+import com.RealState.Project.DTO.Auth.*;
 import com.RealState.Project.Entity.RefreshToken;
 import com.RealState.Project.Entity.Type.AuthProviderType;
 import com.RealState.Project.Entity.User;
-import com.RealState.Project.Repository.EmailOtpRepository;
 import com.RealState.Project.Repository.RefreshTokenRepository;
 import com.RealState.Project.Repository.UserRepository;
 import com.RealState.Project.Service.OtpService;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -80,7 +71,7 @@ public class AuthService {
         return new SignupResponseDTO(user.getId(),user.getUsername());
     }
 
-    public  LoginResponseDTO login(LoginRequestDTO dto) {
+    public LoginResponseDTO login(LoginRequestDTO dto) {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(dto.getUsername(),dto.getPassword())

@@ -11,7 +11,7 @@ import lombok.ToString;
 @Entity
 public class Office {
     @Id
-    @Column(name = "officeId")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int oid;
 
     @Column(nullable = false)

@@ -11,6 +11,7 @@ import lombok.ToString;
 @Entity
 public class Performance {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int trackId;
 
     @Column(name = "deals",nullable = false)

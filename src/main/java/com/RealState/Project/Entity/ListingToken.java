@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @ToString
 public class ListingToken {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int token_id;
 
     @CreationTimestamp

@@ -12,6 +12,7 @@ import lombok.ToString;
 @Entity
 public class Property {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int pid;
 
     @Column(nullable = false,length = 10)

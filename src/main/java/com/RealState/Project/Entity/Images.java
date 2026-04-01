@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @ToString
 public class Images {
     @Id
-   // @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int image_id;
 
     @Column(nullable = false)

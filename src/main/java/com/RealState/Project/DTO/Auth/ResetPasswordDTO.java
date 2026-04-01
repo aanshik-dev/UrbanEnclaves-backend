@@ -1,16 +1,16 @@
-package com.RealState.Project.DTO;
+package com.RealState.Project.DTO.Auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
 @Data
 @AllArgsConstructor
-public class SignupRequestDTO {
+@NoArgsConstructor
+public class ResetPasswordDTO {
 
-    private String username;
-    private String password;
     private String email;
     private String otp;
+    private String newPassword;
+    private String confirmPassword;
 }
