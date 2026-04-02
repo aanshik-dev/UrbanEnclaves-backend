@@ -50,8 +50,7 @@ application-*.properties
 application-*.yml
 
 # Database / SQL
-*.db
-data.sql
+
 
 # Env files
 .env

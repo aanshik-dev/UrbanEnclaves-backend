@@ -1,4 +1,4 @@
-package com.RealState.Project.DTO;
+package com.RealState.Project.DTO.Auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

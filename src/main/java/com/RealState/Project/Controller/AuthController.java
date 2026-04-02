@@ -1,6 +1,6 @@
 package com.RealState.Project.Controller;
 
-import com.RealState.Project.DTO.*;
+import com.RealState.Project.DTO.Auth.*;
 import com.RealState.Project.Security.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

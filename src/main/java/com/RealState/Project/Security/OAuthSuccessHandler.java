@@ -1,7 +1,6 @@
 package com.RealState.Project.Security;
 
-import com.RealState.Project.DTO.LoginResponseDTO;
-import com.RealState.Project.Entity.User;
+import com.RealState.Project.DTO.Auth.LoginResponseDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
