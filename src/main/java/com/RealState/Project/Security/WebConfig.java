@@ -26,11 +26,14 @@ public class WebConfig {
                 .csrf(csrfConfig->csrfConfig.disable())
                 .sessionManagement(session->session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth->auth
-                        .requestMatchers("/public/**","/auth/**").permitAll()
-                        .anyRequest().authenticated()
+//                .authorizeHttpRequests(auth->auth
+//                        .requestMatchers("/public/**","/auth/**").permitAll()
+//                        .anyRequest().authenticated()
+//                )
+//                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll()
                 )
-                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oAuth->oAuth.failureHandler(
                         (request, response, exception) ->{
                             log.error("Oauth2 error :{}",exception.getMessage());
