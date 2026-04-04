@@ -1,5 +1,6 @@
 package com.RealState.Project.Service;
 
+import com.RealState.Project.DTO.TransactionDTO;
 import com.RealState.Project.DTO.TransactionRequestDTO;
 import com.RealState.Project.Entity.Transaction;
 
@@ -9,11 +10,9 @@ public interface TransactionService {
 
     Transaction createTransaction(TransactionRequestDTO request);
 
-    List<Transaction> getAllTransactions();
+    public List<TransactionDTO> getTransactions();
 
-    Transaction getTransactionById(Long id);
+    TransactionDTO getTransactionById(Long id);
 
-    List<Transaction> getUserTransactions(Long userId);
 
-    List<Transaction> getAgentTransactions(Long agentId);
 }

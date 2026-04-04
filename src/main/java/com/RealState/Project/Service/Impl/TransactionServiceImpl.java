@@ -1,15 +1,20 @@
 package com.RealState.Project.Service.Impl;
 
+import com.RealState.Project.DTO.TransactionDTO;
 import com.RealState.Project.DTO.TransactionRequestDTO;
 import com.RealState.Project.Entity.Agent;
 import com.RealState.Project.Entity.ListingToken;
 import com.RealState.Project.Entity.Transaction;
 import com.RealState.Project.Entity.User;
+import com.RealState.Project.Mapper.TransactionMapper;
 import com.RealState.Project.Repository.AgentRepository;
 import com.RealState.Project.Repository.ListingTokenRepository;
 import com.RealState.Project.Repository.TransactionRepository;
 import com.RealState.Project.Repository.UserRepository;
 import com.RealState.Project.Service.TransactionService;
+import com.RealState.Project.Strategy.TransactionAccessStrategy;
+import com.RealState.Project.Strategy.TransactionStrategyFactory;
+import com.RealState.Project.Utils.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +27,8 @@ public class TransactionServiceImpl implements TransactionService {
     private final AgentRepository agentRepository;
     private final UserRepository userRepository;
     private final ListingTokenRepository listingTokenRepository;
+    public final SecurityUtil securityUtil;
+    private final TransactionStrategyFactory strategyFactory;
 
     @Override
     public Transaction createTransaction(TransactionRequestDTO request) {
@@ -48,31 +55,38 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<Transaction> getAllTransactions() {
-        return transactionRepository.findAll();
+    public List<TransactionDTO> getTransactions() {
+        User user = securityUtil.getCurrentUser();
+
+        return strategyFactory
+                .getStrategy(user.getUserProfile().getUserType())
+                .getTransactions(user)
+                .stream()
+                .map(TransactionMapper::toDTO)
+                .toList();
     }
 
-    @Override
-    public Transaction getTransactionById(Long id) {
-        return transactionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transaction not found"));
-    }
 
     @Override
-    public List<Transaction> getUserTransactions(Long userId) {
+    public TransactionDTO getTransactionById(Long id) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = securityUtil.getCurrentUser();
 
-        return transactionRepository.findByBuyer_id(user);
-    }
+        Transaction transaction =
+                transactionRepository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException("Transaction not found"));
 
-    @Override
-    public List<Transaction> getAgentTransactions(Long agentId) {
+        TransactionAccessStrategy strategy =
+                strategyFactory.getStrategy(
+                        user.getUserProfile().getUserType()
+                );
 
-        Agent agent = agentRepository.findById(agentId)
-                .orElseThrow(() -> new RuntimeException("Agent not found"));
+        if(!strategy.canAccess(transaction,user)){
 
-        return transactionRepository.findByAgent_id(agent);
+            throw new RuntimeException("Access Denied");
+        }
+
+        return TransactionMapper.toDTO(transaction);
     }
 }

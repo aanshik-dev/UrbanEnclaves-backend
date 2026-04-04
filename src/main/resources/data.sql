@@ -12,11 +12,6 @@ values
 ("meena" , 22);
 
 
-INSERT INTO office (email,password,phone,city) VALUES
-('office.delhi@realestate.com','$2a$10$2txrixsK3lSwpA0qew7iO.GGnSmHxlFcFwNRDUwFopp.INSRojroK',9898878005,'New Delhi'),
-('office.mumbai@realestate.com','$2a$10$2txrixsK3lSwpA0qew7iO.GGnSmHxlFcFwNRDUwFopp.INSRojroK',9752658881,'Mumbai'),
-('office.bangalore@realestate.com','$2a$10$2txrixsK3lSwpA0qew7iO.GGnSmHxlFcFwNRDUwFopp.INSRojroK',9944307144,'Bangalore');
-
 INSERT INTO user (username,email,password,provider_type) VALUES
 ('anmol','anmol@gmail.com','$2a$10$5s9xbuNG60CXT0S7SxLyY.jpFJhFOduZQiOwQg8r7UmheqrG5znu6','EMAIL'),
 ('rahul','rahul@gmail.com','$2a$10$5s9xbuNG60CXT0S7SxLyY.jpFJhFOduZQiOwQg8r7UmheqrG5znu6','EMAIL'),
@@ -27,7 +22,11 @@ INSERT INTO user (username,email,password,provider_type) VALUES
 ('vikas','vikas@gmail.com','$2a$10$5s9xbuNG60CXT0S7SxLyY.jpFJhFOduZQiOwQg8r7UmheqrG5znu6','EMAIL'),
 ('ramesh','ramesh@gmail.com','$2a$10$5s9xbuNG60CXT0S7SxLyY.jpFJhFOduZQiOwQg8r7UmheqrG5znu6','EMAIL'),
 ('suresh','suresh@gmail.com','$2a$10$5s9xbuNG60CXT0S7SxLyY.jpFJhFOduZQiOwQg8r7UmheqrG5znu6','EMAIL'),
-('deepak','deepak@gmail.com','$2a$10$5s9xbuNG60CXT0S7SxLyY.jpFJhFOduZQiOwQg8r7UmheqrG5znu6','EMAIL');
+('deepak','deepak@gmail.com','$2a$10$5s9xbuNG60CXT0S7SxLyY.jpFJhFOduZQiOwQg8r7UmheqrG5znu6','EMAIL'),
+('office_delhi','office.delhi@realestate.com','$2a$10$5s9xbuNG60CXT0S7SxLyY.jpFJhFOduZQiOwQg8r7UmheqrG5znu6','EMAIL'),
+('office_mumbai','office.mumbai@realestate.com','$2a$10$5s9xbuNG60CXT0S7SxLyY.jpFJhFOduZQiOwQg8r7UmheqrG5znu6','EMAIL'),
+('singh','anmol24@gmail.com','$2a$10$5s9xbuNG60CXT0S7SxLyY.jpFJhFOduZQiOwQg8r7UmheqrG5znu6','EMAIL'),
+('deepika','deepika@gmail.com','$2a$10$5s9xbuNG60CXT0S7SxLyY.jpFJhFOduZQiOwQg8r7UmheqrG5znu6','EMAIL');
 
 
 INSERT INTO user_profile
@@ -42,23 +41,31 @@ VALUES
 (7,'Vikas',9876543216,'url7','Koregaon','Pune',411001,'USER'),
 (8,'Ramesh',9876543217,'url8','Banjara','Hyderabad',500001,'USER'),
 (9,'Suresh',9876543218,'url9','Sector 18','Noida',201301,'USER'),
-(10,'Deepak',9876543219,'url10','Salt Lake','Kolkata',700001,'USER');
+(10,'Deepak',9876543219,'url10','Salt Lake','Kolkata',700001,'USER'),
+(11,'Delhi Office',9898878005,'office1','Connaught','Delhi',110001,'OFFICE'),
+(12,'Mumbai Office',9752658881,'office2','Andheri','Mumbai',400053,'OFFICE'),
+(13,'AKS',9752658881,'admin_url','Andheri','Mumbai',400053,'ADMIN'),
+(14,'Deepika',9876543219,'url10','Salt Lake','Kolkata',700001,'USER');
 
+INSERT INTO office (office_id,office_name,location,office_number)
+VALUES
+(11,'Delhi Office','New Delhi',9898878005),
+(12,'Mumbai Office','Mumbai',9752658881);
 
 INSERT INTO agent
 (agent_id,commission_rate,licence_number,experience,status,office_id)
 VALUES
-(2,4.5,'LIC1001',5,'ACTIVE',1),
-(3,3.8,'LIC1002',3,'ACTIVE',2);
+(2,4.5,'LIC1001',5,'ACTIVE',11),
+(3,3.8,'LIC1002',3,'ACTIVE',12);
 
 INSERT INTO property
 (house_no,locality,area,city,pin,size,type,bhk,year_built,owner_id,office_id)
 VALUES
-('A101','Connaught','Central','Delhi',110001,1200,'FLAT',2,2018,1,1),
-('B201','Andheri','West','Mumbai',400053,1500,'APARTMENT',3,2020,4,2),
-('C301','Whitefield','IT','Bangalore',560001,1400,'FLAT',3,2019,5,3),
-('D401','MG Road','Central','Delhi',110002,1000,'FLAT',2,2017,6,1),
-('E501','Sector 18','Central','Noida',201301,1300,'FLAT',3,2016,7,1);
+('A101','Connaught','Central','Delhi',110001,1200,'FLAT',2,2018,7,11),
+('B201','Andheri','West','Mumbai',400053,1500,'APARTMENT',3,2020,8,12),
+('C301','Whitefield','IT','Bangalore',560001,1400,'FLAT',4,2019,9,11),
+('D401','MG Road','Central','Delhi',110002,1000,'FLAT',5,2017,10,12),
+('E501','Sector 18','Central','Noida',201301,1300,'FLAT',6,2016,14,11);
 
 INSERT INTO listing_token
 (list_type,price,description,status,pid,aid)

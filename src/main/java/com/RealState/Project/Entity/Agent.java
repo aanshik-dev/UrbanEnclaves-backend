@@ -3,16 +3,17 @@ package com.RealState.Project.Entity;
 import com.RealState.Project.Entity.Type.Status;
 import jakarta.persistence.*;
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
-@ToString
 public class Agent{
     @Id
     private Long id;
@@ -20,6 +21,7 @@ public class Agent{
     @OneToOne
     @MapsId
     @JoinColumn(name="agent_id")
+    @JsonIgnore
     private User user;
 
     @Column(nullable = false)
@@ -37,5 +39,5 @@ public class Agent{
 
     @ManyToOne(cascade = CascadeType.PERSIST, optional = false)
     @JoinColumn(name="officeId")
-    private Office office_id;
+    private Office office;
 }
