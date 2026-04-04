@@ -4,6 +4,7 @@ import com.RealState.Project.DTO.ListingTokenDTO;
 import com.RealState.Project.Entity.Agent;
 import com.RealState.Project.Entity.ListingToken;
 import com.RealState.Project.Entity.Property;
+import com.RealState.Project.Entity.Type.Status;
 import com.RealState.Project.Repository.AgentRepository;
 import com.RealState.Project.Repository.ListingTokenRepository;
 import com.RealState.Project.Repository.PropertyRepository;
@@ -32,8 +33,8 @@ public class ListingPropertyServiceImpl implements ListingPropertyServices {
 
         for(ListingToken token:tokens){
             ListingTokenDTO listingTokenDTO=listingTokenMapper.toDTO(token);
-            listingTokenDTO.setAgent_id(token.getAgentId().getId());
-            listingTokenDTO.setPid((long) token.getPid().getPid());
+            listingTokenDTO.setAgent_id(token.getAgent().getId());
+            listingTokenDTO.setPid((long) token.getPid().getId());
             tokenDTOs.add(listingTokenDTO);
         }
 
@@ -50,7 +51,7 @@ public class ListingPropertyServiceImpl implements ListingPropertyServices {
 
         ListingToken listingToken=listingTokenMapper.toEntity(listingTokenDTO);
         listingToken.setPid(property);
-        listingToken.setAgentId(agent);
+        listingToken.setAgent(agent);
 
         listingTokenRepository.save(listingToken);
         return listingTokenDTO;
@@ -62,8 +63,8 @@ public class ListingPropertyServiceImpl implements ListingPropertyServices {
                 .orElseThrow(()->new RuntimeException("Listing Token not found"));
 
         ListingTokenDTO listingTokenDTO=listingTokenMapper.toDTO(listingToken);
-        listingTokenDTO.setPid((long) listingToken.getPid().getPid());
-        listingToken.setAgentId(listingToken.getAgentId());
+        listingTokenDTO.setPid((long) listingToken.getPid().getId());
+        listingToken.setAgent(listingToken.getAgent());
 
         return listingTokenDTO;
     }
@@ -83,7 +84,7 @@ public class ListingPropertyServiceImpl implements ListingPropertyServices {
         listingToken.setDescription(listingTokenDTO.getDescription());
         listingToken.setPrice(listingTokenDTO.getPrice());
         listingToken.setListingType(listingTokenDTO.getListingType());
-        listingToken.setAgentId(agent);
+        listingToken.setAgent(agent);
         listingToken.setPid(property);
         listingTokenRepository.save(listingToken);
 

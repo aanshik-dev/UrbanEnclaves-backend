@@ -16,9 +16,9 @@ public interface PropertyMapper {
     PropertyRequestDTO toPropertyRequestDTO(Property property);
 
 
-    @Mapping(target = "pid", ignore = true)
-    @Mapping(target = "ownerId", ignore = true)
-    @Mapping(target = "officeId", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "owner", ignore = true)
+    @Mapping(target = "office", ignore = true)
     Property toProperty(PropertyRequestDTO propertyRequestDTO);
 
 }

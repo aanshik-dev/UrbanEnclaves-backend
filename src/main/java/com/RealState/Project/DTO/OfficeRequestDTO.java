@@ -1,8 +1,7 @@
 package com.RealState.Project.DTO;
 
 public class OfficeRequestDTO {
-    private String city;
-    private long phone;
-    private String email;
-    private String password;
+    private String location;
+    private long officeNumber;
+    private String officeName;
 }

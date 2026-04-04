@@ -16,7 +16,7 @@ public class PropertyRequestDTO {
     private float size;
     private String city;
     private String area;
-    private int yearBuilt;
+    private int year_built;
     private int pin;
     private Long officeId;
     private Long ownerId;

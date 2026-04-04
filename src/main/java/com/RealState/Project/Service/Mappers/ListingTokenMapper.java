@@ -15,7 +15,7 @@ public interface ListingTokenMapper {
 
     @Mapping(target = "token_id",ignore = true)
     @Mapping(target = "listingDate",ignore = true)
-    @Mapping(target = "agentId",ignore = true)
+    @Mapping(target = "agent",ignore = true)
     @Mapping(target = "pid",ignore = true)
     ListingToken toEntity(ListingTokenDTO listingTokenDTO);
 }

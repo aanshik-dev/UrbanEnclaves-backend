@@ -6,10 +6,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,uses = {UserMapper.class})
 public interface OfficeMapper {
     OfficeRequestDTO toOfficeRequestDTO(Office office);
 
-    @Mapping(target = "oid",ignore = true)
+    @Mapping(target = "id",ignore = true)
+    @Mapping(target = "agents",ignore = true)
+    @Mapping(target = "properties",ignore = true)
     Office toOffice(OfficeRequestDTO officeRequestDTO);
 }

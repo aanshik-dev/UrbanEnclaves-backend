@@ -11,5 +11,9 @@ public interface UserMapper {
     UserRequestDTO toUserRequestDTO(User user);
 
     @Mapping(target = "id",ignore = true)
+    @Mapping(target = "providerType",ignore = true)
+    @Mapping(target = "providerId",ignore = true)
+    @Mapping(target = "password",ignore = true)
+    @Mapping(target = "userProfile",ignore = true)
     User toUser(UserRequestDTO userRequestDTO);
 }

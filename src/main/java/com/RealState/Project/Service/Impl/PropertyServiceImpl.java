@@ -37,10 +37,10 @@ public class PropertyServiceImpl implements PropertyService {
                 .city(request.getCity())
                 .area(request.getArea())
                 .size(request.getSize())
-                .yearBuilt(request.getYearBuilt())
+                .year_built(request.getYear_built())
                 .pin(request.getPin())
-                .officeId(office)
-                .ownerId(owner)
+                .office(office)
+                .owner(owner)
                 .build();
 
         propertyRepository.save(property);
@@ -67,10 +67,10 @@ public class PropertyServiceImpl implements PropertyService {
         property.setCity(request.getCity());
         property.setArea(request.getArea());
         property.setSize(request.getSize());
-        property.setYearBuilt(request.getYearBuilt());
+        property.setYear_built(request.getYear_built());
         property.setPin(request.getPin());
-        property.setOfficeId(office);
-        property.setOwnerId(owner);
+        property.setOffice(office);
+        property.setOwner(owner);
 
         propertyRepository.save(property);
         return request;
@@ -92,11 +92,11 @@ public class PropertyServiceImpl implements PropertyService {
 
         PropertyRequestDTO propertyRequestDTO=propertyMapper.toPropertyRequestDTO(property);
 
-        User user = property.getOwnerId();
-        Office office = property.getOfficeId();
+        User user = property.getOwner();
+        Office office = property.getOffice();
 
         propertyRequestDTO.setOwnerId(user.getId());
-        propertyRequestDTO.setOfficeId((long) office.getOid());
+        propertyRequestDTO.setOfficeId((long) office.getId());
 
         return propertyRequestDTO;
     }
