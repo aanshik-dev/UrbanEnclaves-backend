@@ -1,6 +1,7 @@
 package com.RealState.Project.Controller.Transaction;
 
 
+import com.RealState.Project.DTO.TransactionDTO;
 import com.RealState.Project.DTO.TransactionRequestDTO;
 import com.RealState.Project.Entity.Transaction;
 import com.RealState.Project.Service.TransactionService;
@@ -25,16 +26,16 @@ public class TransactionController {
     }
 
     // GET All Transactions
-    @GetMapping
-    public List<Transaction> getAllTransactions(){
+    @GetMapping("/me/transactions")
+    public List<TransactionDTO> getTransactions(){
 
-        return transactionService.getAllTransactions();
+        return transactionService.getTransactions();
     }
 
 
     // GET Transaction by Id
     @GetMapping("/{transactionId}")
-    public Transaction getTransactionById(@PathVariable Long transactionId){
+    public TransactionDTO getTransactionById(@PathVariable Long transactionId){
 
         return transactionService.getTransactionById(transactionId);
     }

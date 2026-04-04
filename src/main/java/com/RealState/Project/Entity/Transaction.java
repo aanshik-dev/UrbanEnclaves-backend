@@ -9,7 +9,8 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity

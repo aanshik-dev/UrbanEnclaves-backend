@@ -3,17 +3,18 @@ import com.RealState.Project.Entity.Type.Property_type;
 
 import jakarta.persistence.*;
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ToString
 @Entity
 public class Property {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int pid;
+    private Long id;
 
     @Column(nullable = false,length = 10)
     private String houseNo;
@@ -41,13 +42,14 @@ public class Property {
     private int BHK;
 
     @Column(length=4)
-    private int yearBuilt;
+    private int year_built;
 
     @ManyToOne(cascade = CascadeType.PERSIST,optional = false)
     @JoinColumn(name="ownerId")
-    private User ownerId;
+    @JsonIgnore
+    private User owner;
 
     @ManyToOne(cascade = CascadeType.PERSIST,optional = false)
     @JoinColumn(name = "officeId")
-    private Office officeId;
+    private Office office;
 }

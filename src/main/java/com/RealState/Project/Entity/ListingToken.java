@@ -1,19 +1,21 @@
 package com.RealState.Project.Entity;
 
 import com.RealState.Project.Entity.Type.Listing_type;
+import com.RealState.Project.Entity.Type.Status;
 import jakarta.persistence.*;
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ToString
 public class ListingToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,14 +35,16 @@ public class ListingToken {
     private String description;
 
     @Column(nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @ManyToOne(cascade = CascadeType.PERSIST, optional = false)
     @JoinColumn(name="pid")
+    @JsonIgnore
     private Property pid;
 
     @ManyToOne(optional = true)
-    @JoinColumn(name = "aid")   // FK column in listing_token
-    private Agent agentId;
-
+    @JoinColumn(name = "aid")
+    @JsonIgnore
+    private Agent agent;
 }

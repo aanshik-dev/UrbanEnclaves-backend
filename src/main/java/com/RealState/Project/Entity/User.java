@@ -8,7 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.minidev.json.annotate.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -41,8 +43,18 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
-        return List.of();
+        if(userProfile == null || userProfile.getUserType() == null){
+            return List.of();
+        }
+
+        return List.of(
+                new SimpleGrantedAuthority(
+                        "ROLE_" + userProfile.getUserType().name()
+                )
+        );
     }
 
-    
+    @OneToOne(mappedBy = "user")
+    @JsonIgnore
+    private UserProfile userProfile;
 }

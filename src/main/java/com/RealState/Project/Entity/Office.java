@@ -1,28 +1,37 @@
 package com.RealState.Project.Entity;
 import jakarta.persistence.*;
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 
-@Data
+import java.util.List;
+
+
+@Entity
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ToString
-@Entity
 public class Office {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int oid;
+    private Long id;
 
-    @Column(nullable = false)
-    private String password;
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "office_id")
+    @JsonIgnore
+    private User user;
 
-    @Column(nullable = false,length=40)
-    private String email;
+    private String officeName;
+    private String location;
+    private String officeNumber;
 
-    @Column(nullable = false)
-    private long phone;
+    @OneToMany(mappedBy = "office")
+    @JsonIgnore
+    private List<Agent> agents;
 
-    @Column(nullable = false)
-    private String city;
-
+    @OneToMany(mappedBy = "office")
+    @JsonIgnore
+    private List<Property> properties;
 }
