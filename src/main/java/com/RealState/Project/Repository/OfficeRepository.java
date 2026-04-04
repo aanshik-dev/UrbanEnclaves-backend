@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface OfficeRepository extends JpaRepository<Office,Long> {
 
     Optional<Office> findByUser(User user);
+
 }

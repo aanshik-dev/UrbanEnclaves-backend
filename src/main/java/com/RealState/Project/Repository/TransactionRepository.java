@@ -188,4 +188,13 @@ JOIN FETCH o.userProfile
 WHERE p.owner = :user
 """)
     List<Transaction> findBySellerWithDetails(User user);
+
+
+    @Query("""
+SELECT t FROM Transaction t
+ORDER BY t.transactionDate DESC
+""")
+    List<Transaction> findRecentTransactions(Pageable pageable);
 }
+
+

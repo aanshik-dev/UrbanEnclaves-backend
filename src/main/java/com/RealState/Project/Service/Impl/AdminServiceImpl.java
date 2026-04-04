@@ -1,7 +1,9 @@
 package com.RealState.Project.Service.Impl;
 
 import com.RealState.Project.DTO.Admin.*;
+import com.RealState.Project.DTO.RecentTransactionsDTO;
 import com.RealState.Project.Entity.Agent;
+import com.RealState.Project.Entity.Transaction;
 import com.RealState.Project.Entity.Type.Listing_type;
 import com.RealState.Project.Entity.Type.Status;
 import com.RealState.Project.Entity.Type.Transactions_types;
@@ -13,10 +15,11 @@ import com.RealState.Project.Service.AdminService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.awt.print.Pageable;
+
 import java.time.LocalDate;
 import java.util.*;
 
@@ -34,16 +37,40 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public AdminDashboardDTO getDashboard() {
 
+        Pageable pageable = PageRequest.of(0,5);
+
+        List<Transaction> transactions =
+                transactionRepository.findRecentTransactions(pageable);
+
+        List<RecentTransactionsDTO> recent =
+                transactions.stream()
+                        .map(this::convertToRecentDTO)
+                        .toList();
+
+        Long soldListings =
+                listingTokenRepository.countSoldProperties();
+
+        Long rentListings =
+                listingTokenRepository.countRentProperties();
+
+        Long activeInSold = listingTokenRepository.countSoldListings();
+        Long activeInRent = listingTokenRepository.countRentListings();
+
+
         return AdminDashboardDTO.builder()
                 .totalUsers(userRepository.count())
                 .totalAgents(userRepository.countByUserProfileUserType(UserType.AGENT))
 
                 .totalProperties(propertyRepository.count())
                 .activeListings(listingTokenRepository.countByStatus(Status.ACTIVE))
-                .soldProperties(listingTokenRepository.countByStatus(Status.INACTIVE))
+
+                .soldListings(soldListings)
+                .rentedListings(rentListings)
+                .activeInSold(activeInSold)
+                .activeInRent(activeInRent)
 
                 .agents(agentRepository.getAllAgentsSummary())
-
+                .recentTransactions(recent)
                 .totalRevenue(transactionRepository.totalRevenue())
                 .build();
     }
@@ -101,6 +128,7 @@ public class AdminServiceImpl implements AdminService {
     public TransactionAnalyticsDTO getDealsAnalytics() {
 
         LocalDate now = LocalDate.now();
+
 
         return TransactionAnalyticsDTO.builder()
 
@@ -225,4 +253,39 @@ public class AdminServiceImpl implements AdminService {
         }
     }
 
+    private RecentTransactionsDTO convertToRecentDTO(Transaction t){
+
+        return RecentTransactionsDTO.builder()
+                .transactionId(t.getTid())
+                .amount(t.getAmount())
+                .date(t.getTransactionDate())
+
+                .buyerName(
+                        t.getBuyer()
+                                .getUserProfile()
+                                .getName()
+                )
+
+                .sellerName(
+                        t.getToken()
+                                .getPid()
+                                .getOwner()
+                                .getUserProfile()
+                                .getName()
+                )
+
+                .propertyCity(
+                        t.getToken()
+                                .getPid()
+                                .getCity()
+                )
+
+                .type(t.getType())
+                .mode(t.getMode())
+
+                .build();
+    }
+
 }
+
+

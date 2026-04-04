@@ -9,13 +9,21 @@ import lombok.Data;
 public class AgentPerformanceDTO {
 
     private Long agentId;
-
     private String agentName;
+    private String agentStatus;
+    private String profileUrl;
+    private String phone;
+    private String email;
+    private String experience;
+    private String commissionRate;
 
-    private Long totalDeals;
+    private int total_deals;
+    private int activeDeals;
+    private int totalSales;
 
-    private Double totalRevenue;
+    private float score;
+    private float user_rating;
 
-    private Double totalCommission;
+    private int deals_left;
 
 }

@@ -57,4 +57,12 @@ public class User implements UserDetails {
     @OneToOne(mappedBy = "user")
     @JsonIgnore
     private UserProfile userProfile;
+
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean deleted = false;
+
+    @Override
+    public boolean isEnabled() {
+        return !deleted;
+    }
 }

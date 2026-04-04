@@ -26,6 +26,39 @@ public class WebConfig {
                 .csrf(csrfConfig->csrfConfig.disable())
                 .sessionManagement(session->session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                .exceptionHandling(ex -> ex
+
+                        // 401 — Authentication required
+                        .authenticationEntryPoint((request, response, authException) -> {
+
+                            response.setStatus(401);
+                            response.setContentType("application/json");
+
+                            response.getWriter().write("""
+                        {
+                          "status":401,
+                          "message":"Authentication Required"
+                        }
+                        """);
+                        })
+
+                        // 403 — Access denied
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+
+                            response.setStatus(403);
+                            response.setContentType("application/json");
+
+                            response.getWriter().write("""
+                        {
+                          "status":403,
+                          "message":"Access Denied"
+                        }
+                        """);
+                        })
+                )
+
+
                 .authorizeHttpRequests(auth->auth
                         .requestMatchers("/public/**","/auth/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
@@ -33,6 +66,7 @@ public class WebConfig {
                         .requestMatchers("/user/**").hasRole("USER")
                         .anyRequest().authenticated()
                 )
+
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oAuth->oAuth.failureHandler(
                         (request, response, exception) ->{

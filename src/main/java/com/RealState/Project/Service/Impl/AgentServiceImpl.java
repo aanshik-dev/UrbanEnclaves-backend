@@ -4,15 +4,13 @@ import com.RealState.Project.DTO.AgentDashboardDTO;
 import com.RealState.Project.DTO.AgentPerformanceDTO;
 import com.RealState.Project.Entity.Agent;
 import com.RealState.Project.Entity.Office;
+import com.RealState.Project.Entity.Performance;
 import com.RealState.Project.Entity.Type.Status;
 import com.RealState.Project.Entity.Type.UserType;
 import com.RealState.Project.Entity.User;
 import com.RealState.Project.Exception.AgentNotFoundException;
 import com.RealState.Project.Exception.UserNotFoundException;
-import com.RealState.Project.Repository.AgentRepository;
-import com.RealState.Project.Repository.ListingTokenRepository;
-import com.RealState.Project.Repository.TransactionRepository;
-import com.RealState.Project.Repository.UserRepository;
+import com.RealState.Project.Repository.*;
 import com.RealState.Project.Service.AgentService;
 import com.RealState.Project.Utils.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +30,7 @@ public class AgentServiceImpl implements AgentService {
     private final ListingTokenRepository listingTokenRepository;
     private final UserRepository userRepository;
     private final SecurityUtil securityUtil;
+    private final PerformanceRepository performanceRepository;
 
 
     private Agent getCurrentAgent(){
@@ -120,7 +119,7 @@ public class AgentServiceImpl implements AgentService {
     public AgentPerformanceDTO getMyPerformance() {
 
         Agent agent = getCurrentAgent();
-        return buildPerformance(agent);
+        return convertToDTO(agent);
     }
 
     private void validateAgentAccess(Agent agent){
@@ -152,7 +151,7 @@ public class AgentServiceImpl implements AgentService {
 
         validateAgentAccess(agent);
 
-        return buildPerformance(agent);
+        return convertToDTO(agent);
     }
 
 
@@ -175,29 +174,59 @@ public class AgentServiceImpl implements AgentService {
         }
 
         return agents.stream()
-                .map(this::buildPerformance)
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
 
 
-    private AgentPerformanceDTO buildPerformance(Agent agent){
 
-        Long totalDeals =
-                transactionRepository.countByAgent(agent);
-
-        Double revenue =
-                transactionRepository.getTotalRevenue(agent);
-
-        Double commission =
-                revenue * agent.getCommissionRate()/100;
+    public AgentPerformanceDTO convertToDTO(
+            Agent agent
+    ){
+        int activeDeals = listingTokenRepository.countActiveDeals(agent);
+        Performance performance =
+                performanceRepository
+                        .findByAgent(agent).orElseThrow(
+                                () -> new RuntimeException("Performance not found")
+                        );
 
         return AgentPerformanceDTO.builder()
+
+                // Agent Info
                 .agentId(agent.getId())
-                .agentName(agent.getUser().getUsername())
-                .totalDeals(totalDeals)
-                .totalRevenue(revenue)
-                .totalCommission(commission)
+                .agentName(
+                        agent.getUser()
+                                .getUserProfile()
+                                .getName()
+                )
+                .agentStatus(agent.getStatus().name())
+                .profileUrl(
+                        agent.getUser()
+                                .getUserProfile()
+                                .getProfileURL()
+                )
+                .phone(
+                        String.valueOf(
+                                agent.getUser()
+                                        .getUserProfile()
+                                        .getPhone()
+                        )
+                )
+                .email(agent.getUser().getEmail())
+                .experience(String.valueOf(agent.getExperience()))
+                .commissionRate(String.valueOf(agent.getCommissionRate()))
+
+                // Performance
+                .total_deals(performance.getTotal_deals())
+                .totalSales(performance.getTotalSales())
+                .score(performance.getScore())
+                .user_rating(performance.getUser_rating())
+                .deals_left(performance.getDeals_left())
+
+                // Active Deals
+                .activeDeals(activeDeals)
+
                 .build();
     }
 }

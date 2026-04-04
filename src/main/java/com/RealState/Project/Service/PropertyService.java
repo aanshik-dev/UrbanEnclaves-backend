@@ -1,14 +1,19 @@
 package com.RealState.Project.Service;
 
 import com.RealState.Project.DTO.PropertyRequestDTO;
+import com.RealState.Project.DTO.PropertyResponseDTO;
+
+import java.util.List;
 
 public interface PropertyService {
-    PropertyRequestDTO addProperty(PropertyRequestDTO request) ;
+    PropertyResponseDTO addProperty(PropertyRequestDTO request) ;
 
-    PropertyRequestDTO updateProperty(Long pid, PropertyRequestDTO request);
+    PropertyResponseDTO updateProperty(Long pid, PropertyRequestDTO request);
 
     void deletePropertyByID(Long id);
 
     // get property corresponding to ID
-    PropertyRequestDTO getPropertyById(Long id);
+    PropertyResponseDTO getPropertyById(Long id);
+
+    List<PropertyResponseDTO> getMyProperties();
 }

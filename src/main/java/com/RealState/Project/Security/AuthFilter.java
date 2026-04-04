@@ -30,6 +30,8 @@ public class AuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             log.info("incoming request :{}", request.getRequestURI());
+
+
             final String requestTokenHeader = request.getHeader("Authorization");
             if (requestTokenHeader == null || !requestTokenHeader.startsWith("Bearer")) {
                 filterChain.doFilter(request, response);
@@ -40,7 +42,7 @@ public class AuthFilter extends OncePerRequestFilter {
             String username = authutil.getUsernameFromToken(token);
 
             if (username != null || SecurityContextHolder.getContext().getAuthentication() == null) {
-                User user = userRepository.findByUsername(username).orElseThrow();
+                User user = userRepository.findByUsernameAndDeletedFalse(username).orElseThrow();
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                         new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
@@ -49,8 +51,12 @@ public class AuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         }
         catch (Exception ex){
-            System.out.println(ex.getMessage());
-            handlerExceptionResolver.resolveException(request , response , null , ex);
+            handlerExceptionResolver.resolveException(
+                    request,
+                    response,
+                    null,
+                    new RuntimeException("Token expired or invalid")
+            );
         }
     }
 }

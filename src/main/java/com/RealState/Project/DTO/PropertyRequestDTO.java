@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PropertyRequestDTO {
     private Property_type type;
+    private String desctiption;
     private String houseNo;
     private String locality;
     private int BHK;
@@ -18,6 +19,6 @@ public class PropertyRequestDTO {
     private String area;
     private int year_built;
     private int pin;
+
     private Long officeId;
-    private Long ownerId;
 }

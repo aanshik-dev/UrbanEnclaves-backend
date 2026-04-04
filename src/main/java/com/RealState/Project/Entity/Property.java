@@ -19,6 +19,8 @@ public class Property {
     @Column(nullable = false,length = 10)
     private String houseNo;
 
+    private String description;
+
     @Column(nullable = false)
     private String locality;
 

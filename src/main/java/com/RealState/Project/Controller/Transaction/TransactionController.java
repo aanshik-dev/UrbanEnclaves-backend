@@ -2,6 +2,7 @@ package com.RealState.Project.Controller.Transaction;
 
 
 import com.RealState.Project.DTO.TransactionDTO;
+import com.RealState.Project.DTO.TransactionDecrriptionDTO;
 import com.RealState.Project.DTO.TransactionRequestDTO;
 import com.RealState.Project.Entity.Transaction;
 import com.RealState.Project.Service.TransactionService;
@@ -20,7 +21,7 @@ public class TransactionController {
 
     // POST Transaction
     @PostMapping
-    public Transaction createTransaction(@RequestBody TransactionRequestDTO request){
+    public TransactionDecrriptionDTO createTransaction(@RequestBody TransactionRequestDTO request){
 
         return transactionService.createTransaction(request);
     }
@@ -35,7 +36,7 @@ public class TransactionController {
 
     // GET Transaction by Id
     @GetMapping("/{transactionId}")
-    public TransactionDTO getTransactionById(@PathVariable Long transactionId){
+    public TransactionDecrriptionDTO getTransactionById(@PathVariable Long transactionId){
 
         return transactionService.getTransactionById(transactionId);
     }

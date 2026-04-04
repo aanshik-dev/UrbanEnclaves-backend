@@ -18,13 +18,20 @@ public interface AgentRepository extends JpaRepository<Agent,Long> {
     List<Agent> findByOffice(Office office);
 
     @Query("""
-    SELECT new com.RealState.Project.DTO.AgentSummaryDTO(
-    a.id, u.username, up.phone, a.status, p.user_rating )
-    FROM Agent a
-    JOIN a.user u
-    JOIN u.userProfile up
-    LEFT JOIN Performance p ON p.agent_id = a
-    """)
+SELECT new com.RealState.Project.DTO.AgentSummaryDTO(
+a.id,
+u.username,
+p.total_deals,
+p.score,
+up.phone,
+a.status,
+p.user_rating
+)
+FROM Agent a
+JOIN a.user u
+JOIN u.userProfile up
+LEFT JOIN Performance p ON p.agent = a
+""")
     List<AgentSummaryDTO> getAllAgentsSummary();
 
     Long countByOffice(Office office);
@@ -37,4 +44,15 @@ public interface AgentRepository extends JpaRepository<Agent,Long> {
 
     // Optional (active agents)
     List<Agent> findByOfficeAndStatus(Office office, Status status);
+
+    @Query("""
+SELECT a FROM Agent a 
+LEFT JOIN ListingToken l 
+ON l.agent = a AND l.status = com.RealState.Project.Entity.Type.Status.ACTIVE
+WHERE a.office = :office
+GROUP BY a
+ORDER BY COUNT(l) ASC
+""")
+    List<Agent> findLeastBusyAgent(Office office);
+
 }

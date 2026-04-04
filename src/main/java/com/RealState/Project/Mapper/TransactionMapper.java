@@ -14,7 +14,8 @@ public class TransactionMapper {
         dto.setDate(t.getTransactionDate());
 
         // Agent
-
+        dto.setType(t.getType());
+        dto.setMode(t.getMode());
         dto.setAgentId(t.getAgent().getId());
         dto.setAgentName(
                 t.getAgent()

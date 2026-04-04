@@ -31,5 +31,5 @@ public class Performance {
 
     @OneToOne(cascade = CascadeType.ALL,optional = false,orphanRemoval = true)
     @JoinColumn(name = "aid")   // FK column in listing_token
-    private Agent agent_id;
+    private Agent agent;
 }
