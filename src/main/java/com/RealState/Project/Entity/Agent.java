@@ -1,26 +1,29 @@
 package com.RealState.Project.Entity;
 
+
 import com.RealState.Project.Entity.Type.Status;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
+@Getter
+@Setter
 @Entity
 @ToString
 public class Agent{
     @Id
-    private Long id;
+   // @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="serial_no")
+    private int sno;   // hidden
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST, optional = false,orphanRemoval = true)
     @MapsId
     @JoinColumn(name="agent_id")
-    private User user;
+    private User aid;
 
     @Column(nullable = false)
     private float commissionRate;
