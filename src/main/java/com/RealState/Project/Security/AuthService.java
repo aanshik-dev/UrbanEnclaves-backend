@@ -4,6 +4,7 @@ import com.RealState.Project.DTO.Auth.*;
 import com.RealState.Project.Entity.RefreshToken;
 import com.RealState.Project.Entity.Type.AuthProviderType;
 import com.RealState.Project.Entity.User;
+import com.RealState.Project.Exception.AccessDeniedException;
 import com.RealState.Project.Repository.RefreshTokenRepository;
 import com.RealState.Project.Repository.UserRepository;
 import com.RealState.Project.Service.OtpService;
@@ -78,6 +79,13 @@ public class AuthService {
         );
 
         User user = (User)authentication.getPrincipal();
+
+        if (user.getUserProfile().getUserType() != dto.getUserType()) {
+            throw new AccessDeniedException(
+                    "Invalid login type. You are not " + dto.getUserType()
+            );
+        }
+
         String token = authUtil.generateToken(user);
         RefreshToken refreshToken = refreshTokenService.createOrUpdateRefreshToken(user);
 
