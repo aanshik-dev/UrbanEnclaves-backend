@@ -1,4 +1,4 @@
-package com.RealState.Project.Strategy;
+package com.RealState.Project.Strategy.Revenue;
 
 import com.RealState.Project.DTO.RevenuePointDTO;
 import com.RealState.Project.Entity.Type.AnalyticsType;

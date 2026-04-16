@@ -1,10 +1,10 @@
-package com.RealState.Project.Strategy;
+package com.RealState.Project.Strategy.Transaction;
 
 import com.RealState.Project.Entity.Office;
-import com.RealState.Project.Entity.Property;
+import com.RealState.Project.Entity.Transaction;
 import com.RealState.Project.Entity.User;
 import com.RealState.Project.Repository.OfficeRepository;
-import com.RealState.Project.Repository.PropertyRepository;
+import com.RealState.Project.Repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,24 +12,25 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class OfficePropertyStrategy implements PropertyAccessStrategy {
+public class OfficeTransactionStrategy implements TransactionAccessStrategy {
 
     private final OfficeRepository officeRepository;
-    private final PropertyRepository propertyRepository;
+    private final TransactionRepository transactionRepository;
 
     @Override
-    public List<Property> getProperties(User user){
+    public List<Transaction> getTransactions(User user){
 
         Office office =
                 officeRepository.findByUser(user).orElseThrow();
 
-        return propertyRepository.findByOffice(office);
+        return transactionRepository.findByAgentOffice(office);
     }
 
     @Override
-    public boolean canAccess(Property property, User user){
+    public boolean canAccess(Transaction transaction, User user){
 
-        return property
+        return transaction
+                .getAgent()
                 .getOffice()
                 .getUser()
                 .getId()

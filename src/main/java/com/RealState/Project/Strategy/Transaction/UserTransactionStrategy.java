@@ -1,9 +1,8 @@
-package com.RealState.Project.Strategy;
+package com.RealState.Project.Strategy.Transaction;
 
 import com.RealState.Project.Entity.Transaction;
 import com.RealState.Project.Entity.User;
 import com.RealState.Project.Repository.TransactionRepository;
-import jakarta.mail.search.SearchTerm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

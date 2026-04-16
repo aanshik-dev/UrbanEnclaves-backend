@@ -1,4 +1,4 @@
-package com.RealState.Project.Strategy;
+package com.RealState.Project.Strategy.Listing;
 
 import com.RealState.Project.Entity.ListingToken;
 import com.RealState.Project.Entity.User;
@@ -10,19 +10,23 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class AdminListingStrategy implements ListingAccessStrategy {
+public class UserListingStrategy implements ListingAccessStrategy {
 
     private final ListingTokenRepository listingRepository;
 
     @Override
     public List<ListingToken> getListings(User user){
 
-        return listingRepository.findAll();
+        return listingRepository.findByPidOwner(user);
     }
 
     @Override
     public boolean canAccess(ListingToken listing, User user){
 
-        return true;
+        return listing
+                .getPid()
+                .getOwner()
+                .getId()
+                .equals(user.getId());
     }
 }

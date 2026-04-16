@@ -1,4 +1,4 @@
-package com.RealState.Project.Strategy;
+package com.RealState.Project.Strategy.Property;
 
 import com.RealState.Project.Entity.Type.UserType;
 import lombok.RequiredArgsConstructor;
@@ -6,14 +6,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class TransactionStrategyFactory {
+public class PropertyStrategyFactory {
 
-    private final UserTransactionStrategy userStrategy;
-    private final AgentTransactionStrategy agentStrategy;
-    private final OfficeTransactionStrategy officeStrategy;
-    private final AdminTransactionStrategy adminStrategy;
+    private final UserPropertyStrategy userStrategy;
+    private final AgentPropertyStrategy agentStrategy;
+    private final OfficePropertyStrategy officeStrategy;
+    private final AdminPropertyStrategy adminStrategy;
 
-    public TransactionAccessStrategy getStrategy(UserType type){
+    public PropertyAccessStrategy getStrategy(UserType type){
 
         return switch (type){
 
@@ -21,7 +21,6 @@ public class TransactionStrategyFactory {
             case AGENT -> agentStrategy;
             case OFFICE -> officeStrategy;
             case ADMIN -> adminStrategy;
-
         };
     }
 }

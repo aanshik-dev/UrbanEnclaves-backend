@@ -10,13 +10,12 @@ import com.RealState.Project.Repository.AgentRepository;
 import com.RealState.Project.Repository.ListingTokenRepository;
 import com.RealState.Project.Repository.PropertyRepository;
 import com.RealState.Project.Service.ListingPropertyServices;
-import com.RealState.Project.Strategy.ListingAccessStrategy;
-import com.RealState.Project.Strategy.ListingStrategyFactory;
+import com.RealState.Project.Strategy.Listing.ListingAccessStrategy;
+import com.RealState.Project.Strategy.Listing.ListingStrategyFactory;
 import com.RealState.Project.Utils.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

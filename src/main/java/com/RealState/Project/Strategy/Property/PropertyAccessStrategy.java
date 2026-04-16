@@ -1,4 +1,4 @@
-package com.RealState.Project.Strategy;
+package com.RealState.Project.Strategy.Property;
 
 import com.RealState.Project.Entity.Property;
 import com.RealState.Project.Entity.User;

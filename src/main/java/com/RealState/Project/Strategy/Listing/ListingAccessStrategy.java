@@ -1,6 +1,5 @@
-package com.RealState.Project.Strategy;
+package com.RealState.Project.Strategy.Listing;
 
-import com.RealState.Project.DTO.ListingTokenResponseDTO;
 import com.RealState.Project.Entity.ListingToken;
 import com.RealState.Project.Entity.User;
 
