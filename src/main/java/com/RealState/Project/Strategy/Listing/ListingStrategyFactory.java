@@ -1,4 +1,4 @@
-package com.RealState.Project.Strategy;
+package com.RealState.Project.Strategy.Listing;
 
 import com.RealState.Project.Entity.Type.UserType;
 import lombok.RequiredArgsConstructor;

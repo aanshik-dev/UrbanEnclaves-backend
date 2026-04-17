@@ -1,10 +1,10 @@
-package com.RealState.Project.Strategy;
+package com.RealState.Project.Strategy.Listing;
 
+import com.RealState.Project.Entity.ListingToken;
 import com.RealState.Project.Entity.Office;
-import com.RealState.Project.Entity.Transaction;
 import com.RealState.Project.Entity.User;
+import com.RealState.Project.Repository.ListingTokenRepository;
 import com.RealState.Project.Repository.OfficeRepository;
-import com.RealState.Project.Repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,25 +12,25 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class OfficeTransactionStrategy implements TransactionAccessStrategy {
+public class OfficeListingStrategy implements ListingAccessStrategy {
 
     private final OfficeRepository officeRepository;
-    private final TransactionRepository transactionRepository;
+    private final ListingTokenRepository listingRepository;
 
     @Override
-    public List<Transaction> getTransactions(User user){
+    public List<ListingToken> getListings(User user){
 
         Office office =
                 officeRepository.findByUser(user).orElseThrow();
 
-        return transactionRepository.findByAgentOffice(office);
+        return listingRepository.findByPidOffice(office);
     }
 
     @Override
-    public boolean canAccess(Transaction transaction, User user){
+    public boolean canAccess(ListingToken listing, User user){
 
-        return transaction
-                .getAgent()
+        return listing
+                .getPid()
                 .getOffice()
                 .getUser()
                 .getId()
