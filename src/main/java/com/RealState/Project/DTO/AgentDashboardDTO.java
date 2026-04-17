@@ -32,4 +32,7 @@ public class AgentDashboardDTO {
     private Double avgDealValue;
     private Double conversionRate;
 
+
+    private PropertyForOtherTableResponseDTO bestPropertySold;
+
 }

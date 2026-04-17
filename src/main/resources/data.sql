@@ -71,9 +71,9 @@ INSERT INTO listing_token
 (list_type,price,description,status,property_id,agent_id)
 VALUES
 ('SELL',5000000,'Luxury Flat','ACTIVE',1,2),
-('RENT',20000,'Nice Apartment','ACTIVE',2,3),
+('RENT',20000,'Nice Apartment','ACTIVE',2,2),
 ('SELL',7500000,'Villa','ACTIVE',3,2),
-('SELL',3500000,'2BHK','ACTIVE',4,3);
+('SELL',3500000,'2BHK','ACTIVE',4,2);
 
 INSERT INTO performance
 (deals,total_sales,score,user_rating,deals_left,agent_id)
@@ -102,6 +102,5 @@ INSERT INTO transaction
 (amount,type,mode,agent_id,token_id,buyer_id)
 VALUES
 (5000000,'FULL','ONLINE',2,1,1),
-(20000,'ADVANCE','CARD',3,2,4),
-(7500000,'ADVANCE','ONLINE',2,3,5),
-(3500000,'FULL','BANK_TRANSFER',3,4,6);
+(20000,'ADVANCE','CARD',2,2,4),
+(7500000,'ADVANCE','ONLINE',2,3,5);

@@ -1,14 +1,12 @@
 package com.RealState.Project.Service.Impl;
 
 
-import com.RealState.Project.DTO.ListingTokenRequestDTO;
-import com.RealState.Project.DTO.ListingTokenResponseDTO;
+import com.RealState.Project.DTO.*;
 import com.RealState.Project.Entity.*;
 import com.RealState.Project.Entity.Type.Status;
+import com.RealState.Project.Entity.Type.Transactions_types;
 import com.RealState.Project.Entity.Type.UserType;
-import com.RealState.Project.Repository.AgentRepository;
-import com.RealState.Project.Repository.ListingTokenRepository;
-import com.RealState.Project.Repository.PropertyRepository;
+import com.RealState.Project.Repository.*;
 import com.RealState.Project.Service.ListingPropertyServices;
 import com.RealState.Project.Strategy.Listing.ListingAccessStrategy;
 import com.RealState.Project.Strategy.Listing.ListingStrategyFactory;
@@ -26,28 +24,17 @@ public class ListingPropertyServiceImpl implements ListingPropertyServices {
     private final PropertyRepository propertyRepository;
     private final SecurityUtil securityUtil;
     private  final ListingStrategyFactory listingStrategyFactory;
+    private final PerformanceRepository performanceRepository;
+    private final TransactionRepository transactionRepository;
 
     @Override
     public List<ListingTokenResponseDTO> getAllListedProperties() {
 
         return listingTokenRepository.findAll()
                 .stream()
-                .map(token -> ListingTokenResponseDTO.builder()
-                        .tokenId(token.getId())
-                        .listingDate(token.getListingDate())
-                        .listingType(token.getListingType())
-                        .price(token.getPrice())
-                        .description(token.getDescription())
-                        .status(token.getStatus())
-                        .propertyId(token.getPid().getId())
-                        .agentId(
-                                token.getAgent() != null ?
-                                        token.getAgent().getId() : null
-                        )
-                        .build())
+                .map(this::convertToDTO)
                 .toList();
     }
-
 
     @Override
     public ListingTokenResponseDTO createListingToken(
@@ -65,39 +52,21 @@ public class ListingPropertyServiceImpl implements ListingPropertyServices {
             throw new RuntimeException("Only owner can list property");
         }
 
-        // Get property office
-        Office office = property.getOffice();
-
-        // Get least busy agent
-        Agent agent = agentRepository.findLeastBusyAgent(office)
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No agents available"));
-
-        // Create listing
+        // Create listing (NO AGENT)
         ListingToken listing = ListingToken.builder()
                 .listingType(request.getListingType())
                 .price(request.getPrice())
                 .description(request.getDescription())
-                .status(Status.ACTIVE)
+                .status(Status.INACTIVE)   // 🔥 IMPORTANT CHANGE
                 .pid(property)
-                .agent(agent)
+                .agent(null)               // 🔥 NO AGENT
                 .build();
 
         ListingToken saved = listingTokenRepository.save(listing);
 
-        return ListingTokenResponseDTO.builder()
-                .tokenId(saved.getId())
-                .listingDate(saved.getListingDate())
-                .listingType(saved.getListingType())
-                .price(saved.getPrice())
-                .description(saved.getDescription())
-                .status(saved.getStatus())
-                .propertyId(saved.getPid().getId())
-                .agentId(saved.getAgent().getId())
-                .build();
+        // use convert method (consistency)
+        return convertToDTO(saved);
     }
-
 
     @Override
     public ListingTokenResponseDTO getListedPropertyById(Long listingId){
@@ -105,19 +74,7 @@ public class ListingPropertyServiceImpl implements ListingPropertyServices {
         ListingToken listing = listingTokenRepository.findById(listingId)
                 .orElseThrow(() -> new RuntimeException("Listing not found"));
 
-        return ListingTokenResponseDTO.builder()
-                .tokenId(listing.getId())
-                .listingDate(listing.getListingDate())
-                .listingType(listing.getListingType())
-                .price(listing.getPrice())
-                .description(listing.getDescription())
-                .status(listing.getStatus())
-                .propertyId(listing.getPid().getId())
-                .agentId(
-                        listing.getAgent()!=null ?
-                                listing.getAgent().getId() : null
-                )
-                .build();
+        return convertToDTO(listing);
     }
 
     @Override
@@ -146,19 +103,7 @@ public class ListingPropertyServiceImpl implements ListingPropertyServices {
 
         ListingToken saved = listingTokenRepository.save(listing);
 
-        return ListingTokenResponseDTO.builder()
-                .tokenId(saved.getId())
-                .listingDate(saved.getListingDate())
-                .listingType(saved.getListingType())
-                .price(saved.getPrice())
-                .description(saved.getDescription())
-                .status(saved.getStatus())
-                .propertyId(saved.getPid().getId())
-                .agentId(
-                        saved.getAgent()!=null ?
-                                saved.getAgent().getId() : null
-                )
-                .build();
+        return convertToDTO(saved);
     }
 
     @Override
@@ -197,9 +142,158 @@ public class ListingPropertyServiceImpl implements ListingPropertyServices {
                 .toList();
     }
 
+    @Override
+    public List<ListingTokenResponseDTO> getAvailableListingsForAgent(){
+
+        User currentUser = securityUtil.getCurrentUser();
+
+        // Only agent allowed
+        if(currentUser.getUserProfile().getUserType() != UserType.AGENT){
+            throw new RuntimeException("Only agents can view available listings");
+        }
+
+        List<ListingToken> listings =
+                listingTokenRepository.findAvailableListings();
+
+        return listings.stream()
+                .map(this::convertToDTO)
+                .toList();
+    }
+
+    @Override
+    public ListingTokenResponseDTO acceptListing(Long listingId){
+
+        ListingToken listing = listingTokenRepository.findById(listingId)
+                .orElseThrow(() -> new RuntimeException("Listing not found"));
+
+        User currentUser = securityUtil.getCurrentUser();
+
+        // Only AGENT can accept
+        if(currentUser.getUserProfile().getUserType() != UserType.AGENT){
+            throw new RuntimeException("Only agent can accept listing");
+        }
+
+        Agent agent = agentRepository.findById(currentUser.getId())
+                .orElseThrow(() -> new RuntimeException("Agent not found"));
+
+        if(listing.getAgent() != null){
+            throw new RuntimeException("Listing already assigned to another agent");
+        }
+
+        // assign agent
+        listing.setAgent(agent);
+
+        // activate listing
+        listing.setStatus(Status.ACTIVE);
+
+        ListingToken saved = listingTokenRepository.save(listing);
+
+        return convertToDTO(saved);
+    }
+
+    @Override
+    public ListingTokenResponseDTO leaveListing(Long listingId){
+
+        ListingToken listing = listingTokenRepository.findById(listingId)
+                .orElseThrow(() -> new RuntimeException("Listing not found"));
+
+        User currentUser = securityUtil.getCurrentUser();
+
+        // Only AGENT can leave
+        if(currentUser.getUserProfile().getUserType() != UserType.AGENT){
+            throw new RuntimeException("Only agent can leave listing");
+        }
+
+        Agent agent = agentRepository.findById(currentUser.getId())
+                .orElseThrow(() -> new RuntimeException("Agent not found"));
+
+        // ❗ Check if listing has agent
+        if(listing.getAgent() == null){
+            throw new RuntimeException("Listing is not assigned to any agent");
+        }
+
+        // ❗ Check ownership
+        if(!listing.getAgent().getId().equals(agent.getId())){
+            throw new RuntimeException("You are not assigned to this listing");
+        }
+
+        // ❗ Prevent leaving if already sold (optional)
+        boolean isSold = transactionRepository
+                .existsByToken_Id(listingId);
+
+        if(isSold){
+            throw new RuntimeException("Cannot leave a sold listing");
+        }
+
+        // Remove agent
+        listing.setAgent(null);
+
+        // Update status
+        listing.setStatus(Status.INACTIVE); // or AVAILABLE (your choice)
+
+        ListingToken saved = listingTokenRepository.save(listing);
+
+        return convertToDTO(saved);
+    }
+
 
     private ListingTokenResponseDTO convertToDTO(ListingToken listing){
 
+        // ---------- PROPERTY ----------
+        Property property = listing.getPid();
+
+        PropertyForOtherTableResponseDTO propertyDTO =
+                new PropertyForOtherTableResponseDTO(
+                        property.getId(),
+                        property.getHouseNo(),
+                        property.getDescription(),
+                        property.getLocality(),
+                        property.getArea(),
+                        property.getCity(),
+                        property.getPin(),
+                        property.getSize(),
+                        property.getType(),
+                        property.getBHK()
+                );
+
+        // ---------- OWNER ----------
+        User owner = property.getOwner();
+        UserProfile ownerProfile = owner.getUserProfile();
+
+        UserForOtherTableResponseDTO ownerDTO =
+                new UserForOtherTableResponseDTO(
+                        ownerProfile.getName(),
+                        String.valueOf(ownerProfile.getPhone()),
+                        ownerProfile.getProfileURL()
+                );
+
+        // ---------- AGENT ----------
+        AgentForOtherTableResponseDTO agentDTO = null;
+
+        if(listing.getAgent() != null){
+
+            Agent agent = listing.getAgent();
+            User user = agent.getUser();
+            UserProfile profile = user.getUserProfile();
+
+            String rating = "0";
+
+            Performance performance =
+                    performanceRepository.findByAgent(agent).orElse(null);
+
+            if(performance != null){
+                rating = String.valueOf(performance.getUser_rating());
+            }
+
+            agentDTO = AgentForOtherTableResponseDTO.builder()
+                    .name(profile.getName())
+                    .phone(String.valueOf(profile.getPhone()))
+                    .profileUrl(profile.getProfileURL())
+                    .userRating(rating)
+                    .build();
+        }
+
+        // ---------- FINAL DTO ----------
         return ListingTokenResponseDTO.builder()
                 .tokenId(listing.getId())
                 .listingDate(listing.getListingDate())
@@ -207,11 +301,9 @@ public class ListingPropertyServiceImpl implements ListingPropertyServices {
                 .price(listing.getPrice())
                 .description(listing.getDescription())
                 .status(listing.getStatus())
-                .propertyId(listing.getPid().getId())
-                .agentId(
-                        listing.getAgent() != null ?
-                                listing.getAgent().getId() : null
-                )
+                .property(propertyDTO)
+                .owner(ownerDTO)   // 🔥 NEW
+                .agent(agentDTO)
                 .build();
     }
 }

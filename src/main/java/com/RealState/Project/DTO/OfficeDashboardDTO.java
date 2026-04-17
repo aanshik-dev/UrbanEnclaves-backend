@@ -16,12 +16,13 @@ public class OfficeDashboardDTO {
     private Long totalListings;
     private Long activeListings;
     private Long soldListings;
+    private Long rentedListings;
 
-    private Long sellListings;
-    private Long rentListings;
+    private Long activeInSell;
+    private Long activeInRent;
 
     private Long totalDeals;
 
     private Double totalRevenue;
-    private Double monthlyRevenue;
+    private Double monthlyRevenue;  
 }

@@ -22,16 +22,16 @@ public interface ListingTokenRepository extends JpaRepository<ListingToken,Long>
 
     Long countByPidOffice(Office office);
 
-    Long countByPidOfficeAndStatus(Office office, Status status);
+    Long countByPidOfficeAndStatusAndListingType(Office office, Status status, Listing_type listingType);
 
     Long countByPidOfficeAndListingType(Office office, Listing_type type);
 
     @Query("""
-    SELECT COUNT(l)
-    FROM ListingToken l
-    WHERE l.pid.office = :office
-    AND l.listingDate >= :date
-    """)
+            SELECT COUNT(l)
+            FROM ListingToken l
+            WHERE l.pid.office = :office
+            AND l.listingDate >= :date
+            """)
     Long listingsAfter(Office office, LocalDate date);
 
     List<ListingToken> findByPidOwner(User owner);
@@ -41,45 +41,55 @@ public interface ListingTokenRepository extends JpaRepository<ListingToken,Long>
     List<ListingToken> findByPidOffice(Office office);
 
     @Query("""
-SELECT COUNT(l)
-FROM ListingToken l
-WHERE l.agent = :agent
-AND l.status = com.RealState.Project.Entity.Type.Status.ACTIVE
-""")
+            SELECT COUNT(l)
+            FROM ListingToken l
+            WHERE l.agent = :agent
+            AND l.status = com.RealState.Project.Entity.Type.Status.ACTIVE
+            """)
     int countActiveDeals(Agent agent);
 
     @Query("""
-SELECT COUNT(l)
-FROM ListingToken l
-WHERE l.listingType = com.RealState.Project.Entity.Type.Listing_type.SELL
-AND l.status = com.RealState.Project.Entity.Type.Status.INACTIVE
-""")
+            SELECT COUNT(l)
+            FROM ListingToken l
+            WHERE l.listingType = com.RealState.Project.Entity.Type.Listing_type.SELL
+            AND l.status = com.RealState.Project.Entity.Type.Status.INACTIVE
+            """)
     Long countSoldProperties();
 
     @Query("""
-SELECT COUNT(l)
-FROM ListingToken l
-WHERE l.listingType = com.RealState.Project.Entity.Type.Listing_type.RENT
-AND l.status = com.RealState.Project.Entity.Type.Status.INACTIVE
-""")
+            SELECT COUNT(l)
+            FROM ListingToken l
+            WHERE l.listingType = com.RealState.Project.Entity.Type.Listing_type.RENT
+            AND l.status = com.RealState.Project.Entity.Type.Status.INACTIVE
+            """)
     Long countRentProperties();
 
 
     @Query("""
-SELECT COUNT(l)
-FROM ListingToken l
-WHERE l.listingType = com.RealState.Project.Entity.Type.Listing_type.SELL
-AND l.status = com.RealState.Project.Entity.Type.Status.ACTIVE
-""")
+            SELECT COUNT(l)
+            FROM ListingToken l
+            WHERE l.listingType = com.RealState.Project.Entity.Type.Listing_type.SELL
+            AND l.status = com.RealState.Project.Entity.Type.Status.ACTIVE
+            """)
     Long countSoldListings();
 
     @Query("""
-SELECT COUNT(l)
-FROM ListingToken l
-WHERE l.listingType = com.RealState.Project.Entity.Type.Listing_type.RENT
-AND l.status = com.RealState.Project.Entity.Type.Status.ACTIVE
-""")
+            SELECT COUNT(l)
+            FROM ListingToken l
+            WHERE l.listingType = com.RealState.Project.Entity.Type.Listing_type.RENT
+            AND l.status = com.RealState.Project.Entity.Type.Status.ACTIVE
+            """)
     Long countRentListings();
 
+    List<ListingToken> findByStatus(Status status);
 
+    @Query("""
+            SELECT l FROM ListingToken l
+            JOIN FETCH l.pid p
+            JOIN FETCH p.owner o
+            JOIN FETCH o.userProfile
+            WHERE l.status = 'INACTIVE'
+            AND l.agent IS NULL
+            """)
+    List<ListingToken> findAvailableListings();
 }

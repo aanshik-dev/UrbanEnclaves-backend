@@ -2,12 +2,10 @@ package com.RealState.Project.Service.Impl;
 
 import com.RealState.Project.DTO.AgentDashboardDTO;
 import com.RealState.Project.DTO.AgentPerformanceDTO;
-import com.RealState.Project.Entity.Agent;
-import com.RealState.Project.Entity.Office;
-import com.RealState.Project.Entity.Performance;
+import com.RealState.Project.DTO.PropertyForOtherTableResponseDTO;
+import com.RealState.Project.Entity.*;
 import com.RealState.Project.Entity.Type.Status;
 import com.RealState.Project.Entity.Type.UserType;
-import com.RealState.Project.Entity.User;
 import com.RealState.Project.Exception.AgentNotFoundException;
 import com.RealState.Project.Exception.UserNotFoundException;
 import com.RealState.Project.Repository.*;
@@ -32,6 +30,33 @@ public class AgentServiceImpl implements AgentService {
     private final SecurityUtil securityUtil;
     private final PerformanceRepository performanceRepository;
 
+    private PropertyForOtherTableResponseDTO getBestPropertySold(Long agentId){
+
+        List<Transaction> transactions =
+                transactionRepository.findTopTransactionByAgent(agentId);
+
+        if(transactions.isEmpty()){
+            return null;
+        }
+
+        Transaction top = transactions.get(0);
+
+        ListingToken listing = top.getToken();
+        Property property = listing.getPid();
+
+        return new PropertyForOtherTableResponseDTO(
+                property.getId(),
+                property.getHouseNo(),
+                property.getDescription(),
+                property.getLocality(),
+                property.getArea(),
+                property.getCity(),
+                property.getPin(),
+                property.getSize(),
+                property.getType(),
+                property.getBHK()
+        );
+    }
 
     private Agent getCurrentAgent(){
 
@@ -111,6 +136,7 @@ public class AgentServiceImpl implements AgentService {
 
                 .avgDealValue(avgDeal)
                 .conversionRate(conversion)
+                .bestPropertySold(getBestPropertySold(agent.getId()))
 
                 .build();
     }

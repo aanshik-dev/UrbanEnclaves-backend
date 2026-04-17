@@ -1,6 +1,8 @@
 package com.RealState.Project.Service;
 
 import com.RealState.Project.DTO.*;
+import com.RealState.Project.DTO.Admin.TopAgentDTO;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -14,4 +16,5 @@ public interface OfficeService {
 
     List<ListingDTO> getListings();
 
+    List<TopAgentDTO> getTopAgents();
 }

@@ -275,33 +275,46 @@ ORDER BY CONCAT(
 
     @Query("""
 SELECT new com.RealState.Project.DTO.RevenuePointDTO(
-    CONCAT('',FUNCTION('YEAR', t.transactionDate)),
-    SUM(t.amount*1.0)
+    CONCAT('', FUNCTION('YEAR', t.transactionDate)),
+    SUM(t.amount * 1.0)
 )
 FROM Transaction t
 WHERE t.agent.id = :agentId
 AND t.transactionDate BETWEEN :from AND :to
-GROUP BY FUNCTION('YEAR', t.transactionDate)
-ORDER BY FUNCTION('YEAR', t.transactionDate)
+GROUP BY CONCAT('', FUNCTION('YEAR', t.transactionDate))
+ORDER BY CONCAT('', FUNCTION('YEAR', t.transactionDate))
 """)
     List<RevenuePointDTO> agentYearlyRevenue(
-            Long agentId,
-            LocalDate from,
-            LocalDate to
+            @Param("agentId") Long agentId,
+            @Param("from") LocalDate from,
+            @Param("to") LocalDate to
     );
 
     @Query("""
 SELECT new com.RealState.Project.DTO.RevenuePointDTO(
-    CONCAT('Week ', CAST(FUNCTION('WEEK', t.transactionDate) AS string)),
-    SUM(t.amount*1.0)
+     CONCAT(
+        'Week ',
+        FUNCTION('YEAR', t.transactionDate),
+        '-',
+        FUNCTION('WEEK', t.transactionDate)
+    ),
+    SUM(t.amount * 1.0)
 )
 FROM Transaction t
 WHERE t.agent.id = :agentId
 AND t.transactionDate BETWEEN :from AND :to
-GROUP BY FUNCTION('YEAR', t.transactionDate),
-         FUNCTION('WEEK', t.transactionDate)
-ORDER BY FUNCTION('YEAR', t.transactionDate),
-         FUNCTION('WEEK', t.transactionDate)
+GROUP BY CONCAT(
+        'Week ',
+        FUNCTION('YEAR', t.transactionDate),
+        '-',
+        FUNCTION('WEEK', t.transactionDate)
+    )
+ORDER BY CONCAT(
+        'Week ',
+        FUNCTION('YEAR', t.transactionDate),
+        '-',
+        FUNCTION('WEEK', t.transactionDate)
+    )
 """)
     List<RevenuePointDTO> agentWeeklyRevenue(
             @Param("agentId") Long agentId,
@@ -309,41 +322,62 @@ ORDER BY FUNCTION('YEAR', t.transactionDate),
             @Param("to") LocalDate to
     );
 
-
     @Query("""
 SELECT new com.RealState.Project.DTO.RevenuePointDTO(
-    CONCAT(FUNCTION('YEAR', t.transactionDate),
-    '-',
-    FUNCTION('MONTH', t.transactionDate)
+    CONCAT(
+        FUNCTION('YEAR', t.transactionDate),
+        '-',
+        FUNCTION('MONTH', t.transactionDate)
     ),
-    SUM(t.amount*1.0)
+    SUM(t.amount * 1.0)
 )
 FROM Transaction t
 WHERE t.agent.id = :agentId
 AND t.transactionDate BETWEEN :from AND :to
-GROUP BY FUNCTION('YEAR', t.transactionDate),
-         FUNCTION('MONTH', t.transactionDate)
-ORDER BY FUNCTION('YEAR', t.transactionDate),
-         FUNCTION('MONTH', t.transactionDate)
+GROUP BY CONCAT(
+        FUNCTION('YEAR', t.transactionDate),
+        '-',
+        FUNCTION('MONTH', t.transactionDate)
+)
+ORDER BY CONCAT(
+        FUNCTION('YEAR', t.transactionDate),
+        '-',
+        FUNCTION('MONTH', t.transactionDate)
+)
 """)
     List<RevenuePointDTO> agentMonthlyRevenue(
-            Long agentId,
-            LocalDate from,
-            LocalDate to
+            @Param("agentId") Long agentId,
+            @Param("from") LocalDate from,
+            @Param("to") LocalDate to
     );
 
     @Query("""
 SELECT new com.RealState.Project.DTO.RevenuePointDTO(
-    CONCAT('Week ', CAST(FUNCTION('WEEK', t.transactionDate) AS string)),
-    SUM(t.amount*1.0)
+    CONCAT(
+        'Week ',
+        FUNCTION('YEAR', t.transactionDate),
+        '-W',
+        FUNCTION('WEEK', t.transactionDate)
+    ),
+    SUM(t.amount * 1.0)
 )
 FROM Transaction t
-WHERE t.agent.office.id = :officeId
+JOIN t.agent a
+JOIN a.office o
+WHERE o.id = :officeId
 AND t.transactionDate BETWEEN :from AND :to
-GROUP BY FUNCTION('YEAR', t.transactionDate),
-         FUNCTION('WEEK', t.transactionDate)
-ORDER BY FUNCTION('YEAR', t.transactionDate),
-         FUNCTION('WEEK', t.transactionDate)
+GROUP BY CONCAT(
+        'Week ',
+        FUNCTION('YEAR', t.transactionDate),
+        '-W',
+        FUNCTION('WEEK', t.transactionDate)
+)
+ORDER BY CONCAT(
+        'Week ',
+        FUNCTION('YEAR', t.transactionDate),
+        '-W',
+        FUNCTION('WEEK', t.transactionDate)
+)
 """)
     List<RevenuePointDTO> officeWeeklyRevenue(
             @Param("officeId") Long officeId,
@@ -353,45 +387,85 @@ ORDER BY FUNCTION('YEAR', t.transactionDate),
 
     @Query("""
 SELECT new com.RealState.Project.DTO.RevenuePointDTO(
-    CONCAT(FUNCTION('YEAR', t.transactionDate),
-    '-',
-    FUNCTION('MONTH', t.transactionDate)
+    CONCAT(
+        FUNCTION('YEAR', t.transactionDate),
+        '-',
+        FUNCTION('MONTH', t.transactionDate)
     ),
-    SUM(t.amount*1.0)
+    SUM(t.amount * 1.0)
 )
 FROM Transaction t
-WHERE t.agent.office.id = :officeId
+JOIN t.agent a
+JOIN a.office o
+WHERE o.id = :officeId
 AND t.transactionDate BETWEEN :from AND :to
-GROUP BY FUNCTION('YEAR', t.transactionDate),
-         FUNCTION('MONTH', t.transactionDate)
-ORDER BY FUNCTION('YEAR', t.transactionDate),
-         FUNCTION('MONTH', t.transactionDate)
+GROUP BY CONCAT(
+        FUNCTION('YEAR', t.transactionDate),
+        '-',
+        FUNCTION('MONTH', t.transactionDate)
+)
+ORDER BY CONCAT(
+        FUNCTION('YEAR', t.transactionDate),
+        '-',
+        FUNCTION('MONTH', t.transactionDate)
+)
 """)
     List<RevenuePointDTO> officeMonthlyRevenue(
-            Long officeId,
-            LocalDate from,
-            LocalDate to
+            @Param("officeId") Long officeId,
+            @Param("from") LocalDate from,
+            @Param("to") LocalDate to
     );
 
     @Query("""
 SELECT new com.RealState.Project.DTO.RevenuePointDTO(
-    CONCAT('',FUNCTION('YEAR', t.transactionDate)),
-    SUM(t.amount*1.0)
+    CONCAT('', FUNCTION('YEAR', t.transactionDate)),
+    SUM(t.amount * 1.0)
 )
 FROM Transaction t
-WHERE t.agent.office.id = :officeId
+JOIN t.agent a
+JOIN a.office o
+WHERE o.id = :officeId
 AND t.transactionDate BETWEEN :from AND :to
-GROUP BY FUNCTION('YEAR', t.transactionDate)
-ORDER BY FUNCTION('YEAR', t.transactionDate)
+GROUP BY CONCAT('', FUNCTION('YEAR', t.transactionDate))
+ORDER BY CONCAT('', FUNCTION('YEAR', t.transactionDate))
 """)
     List<RevenuePointDTO> officeYearlyRevenue(
-            Long officeId,
-            LocalDate from,
-            LocalDate to
+            @Param("officeId") Long officeId,
+            @Param("from") LocalDate from,
+            @Param("to") LocalDate to
     );
 
+    @Query("""
+SELECT t FROM Transaction t
+JOIN FETCH t.token l
+JOIN FETCH l.pid p
+WHERE t.agent.id = :agentId
+ORDER BY t.amount DESC
+""")
+    List<Transaction> findTopTransactionByAgent(Long agentId);
 
 
+    boolean existsByToken_Id(Long listingId);
+
+
+    @Query("""
+SELECT 
+    a.id,
+    u.username,
+    COUNT(t.id),
+    SUM(t.amount * 1.0)
+FROM Transaction t
+JOIN t.agent a
+JOIN a.user u
+JOIN a.office o
+WHERE o.id = :officeId
+GROUP BY a.id, u.username
+ORDER BY SUM(t.amount) DESC
+""")
+    List<Object[]> topAgentsByOffice(
+            @Param("officeId") Long officeId,
+            Pageable pageable
+    );
 }
 
 
