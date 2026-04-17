@@ -19,6 +19,7 @@ public class ListingTokenResponseDTO {
     private String description;
     private Status status;
 
-    private Long propertyId;
-    private Long agentId;
+    private PropertyForOtherTableResponseDTO property;
+    private AgentForOtherTableResponseDTO agent;
+    private UserForOtherTableResponseDTO owner;
 }

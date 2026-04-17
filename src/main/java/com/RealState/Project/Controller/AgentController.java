@@ -2,8 +2,11 @@ package com.RealState.Project.Controller;
 
 import com.RealState.Project.DTO.AgentDashboardDTO;
 import com.RealState.Project.DTO.AgentPerformanceDTO;
+import com.RealState.Project.DTO.ListingTokenResponseDTO;
 import com.RealState.Project.Service.AgentService;
+import com.RealState.Project.Service.ListingPropertyServices;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,6 +17,7 @@ import java.util.List;
 public class AgentController {
 
     private final AgentService agentService;
+    private final ListingPropertyServices listingPropertyServices;
 
 
     @GetMapping("/me/dashboard")
@@ -43,5 +47,14 @@ public class AgentController {
 
         return agentService.getAllPerformance();
     }
+
+    @GetMapping("/listings/available")
+    public ResponseEntity<List<ListingTokenResponseDTO>> getAvailableListings(){
+
+        return ResponseEntity.ok(
+                listingPropertyServices.getAvailableListingsForAgent()
+        );
+    }
+
 
 }

@@ -1,13 +1,17 @@
 package com.RealState.Project.Service.Impl;
 
 import com.RealState.Project.DTO.*;
+import com.RealState.Project.DTO.Admin.TopAgentDTO;
 import com.RealState.Project.Entity.Office;
 import com.RealState.Project.Entity.Type.Listing_type;
 import com.RealState.Project.Entity.Type.Status;
+import com.RealState.Project.Entity.Type.UserType;
 import com.RealState.Project.Entity.User;
 import com.RealState.Project.Repository.*;
 import com.RealState.Project.Service.OfficeService;
+import com.RealState.Project.Utils.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,7 +29,7 @@ public class OfficeServiceImpl implements OfficeService {
     private final PropertyRepository propertyRepository;
     private final ListingTokenRepository listingRepository;
     private final TransactionRepository transactionRepository;
-
+    private final SecurityUtil securityUtil;
 
     private Office getCurrentOffice(){
 
@@ -66,17 +70,19 @@ public class OfficeServiceImpl implements OfficeService {
         Long listings =
                 listingRepository.countByPidOffice(office);
 
-        Long activeListings =
-                listingRepository
-                        .countByPidOfficeAndStatus(
-                                office,Status.ACTIVE
-                        );
-
         Long soldListings =
                 listingRepository
-                        .countByPidOfficeAndStatus(
+                        .countByPidOfficeAndStatusAndListingType(
                                 office,
-                                Status.INACTIVE
+                                Status.INACTIVE,
+                                Listing_type.SELL
+                        );
+        Long rentedListings =
+                listingRepository
+                        .countByPidOfficeAndStatusAndListingType(
+                                office,
+                                Status.INACTIVE,
+                                Listing_type.RENT
                         );
 
         Long sellListings =
@@ -113,10 +119,11 @@ public class OfficeServiceImpl implements OfficeService {
                 .activeAgents(activeAgents)
                 .totalProperties(properties)
                 .totalListings(listings)
-                .activeListings(activeListings)
+                .activeListings(sellListings+rentListings)
                 .soldListings(soldListings)
-                .sellListings(sellListings)
-                .rentListings(rentListings)
+                .rentedListings(rentedListings)
+                .activeInSell(sellListings)
+                .activeInRent(rentListings)
                 .totalDeals(totalDeals)
                 .totalRevenue(totalRevenue)
                 .monthlyRevenue(monthlyRevenue)
@@ -174,6 +181,35 @@ public class OfficeServiceImpl implements OfficeService {
                         .status(l.getStatus())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TopAgentDTO> getTopAgents() {
+
+        User user = securityUtil.getCurrentUser();
+
+        // ✅ Restrict to OFFICE only
+        if(user.getUserProfile().getUserType() != UserType.OFFICE){
+            throw new RuntimeException("Only office can access this API");
+        }
+
+        // ✅ officeId = userId (because of @MapsId)
+        Long officeId = user.getId();
+
+        List<Object[]> data =
+                transactionRepository.topAgentsByOffice(
+                        officeId,
+                        PageRequest.of(0, 5)
+                );
+
+        return data.stream()
+                .map(obj -> new TopAgentDTO(
+                        (Long) obj[0],
+                        (String) obj[1],
+                        (Long) obj[2],
+                        (Double) obj[3]
+                ))
+                .toList();
     }
 }
 

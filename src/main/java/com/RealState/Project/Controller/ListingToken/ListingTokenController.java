@@ -64,5 +64,23 @@ public class ListingTokenController {
         );
     }
 
+    @PutMapping("/{listingId}/accept")
+    public ResponseEntity<ListingTokenResponseDTO> acceptListing(
+            @PathVariable Long listingId){
+
+        return ResponseEntity.ok(
+                listingPropertyServices.acceptListing(listingId)
+        );
+    }
+
+
+    @PatchMapping("/{id}/leave")
+    public ResponseEntity<?> leaveListing(@PathVariable Long id){
+
+        return ResponseEntity.ok(
+                listingPropertyServices.leaveListing(id)
+        );
+    }
+
 
 }

@@ -3,6 +3,7 @@ package com.RealState.Project.Controller;
 import com.RealState.Project.DTO.*;
 import com.RealState.Project.Service.OfficeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,16 +30,27 @@ public class OfficeController {
     }
 
 
-    @GetMapping("/me/properties")
-    public List<PropertyDTO> properties(){
+    @GetMapping("/analytics/top-agents")
+    public ResponseEntity<?> topAgents(){
 
-        return officeService.getProperties();
+        return ResponseEntity.ok(
+                officeService.getTopAgents()
+        );
     }
 
 
-    @GetMapping("/me/listings")
-    public List<ListingDTO> listings(){
+//    @GetMapping("/me/properties")
+//    public List<PropertyDTO> properties(){
+//
+//        return officeService.getProperties();
+//    }
+//
+//
+//    @GetMapping("/me/listings")
+//    public List<ListingDTO> listings(){
+//
+//        return officeService.getListings();
+//    }
 
-        return officeService.getListings();
-    }
+
 }

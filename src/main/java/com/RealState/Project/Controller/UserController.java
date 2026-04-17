@@ -1,6 +1,7 @@
 package com.RealState.Project.Controller;
 
 
+import com.RealState.Project.DTO.UserProfileRequestDTO;
 import com.RealState.Project.DTO.UserProfileResponseDTO;
 import com.RealState.Project.Entity.User;
 import com.RealState.Project.Service.UserService;
@@ -9,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
@@ -22,11 +23,26 @@ public class UserController {
         );
     }
 
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> deleteUser(
-            @PathVariable Long userId){
 
-        userService.deleteUser(userId);
+    @GetMapping("/me")
+    public ResponseEntity<UserProfileResponseDTO> getMyProfile() {
+        return ResponseEntity.ok(userService.getCurrentUserProfile());
+    }
+
+    @PostMapping("/me")
+    public ResponseEntity<UserProfileResponseDTO> createOrUpdateProfile(
+            @RequestBody UserProfileRequestDTO dto) {
+
+        return ResponseEntity.ok(
+                userService.createOrUpdateProfile(dto)
+        );
+    }
+
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteMyAccount() {
+
+        userService.softDeleteCurrentUser();
 
         return ResponseEntity.noContent().build();
     }
