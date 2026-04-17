@@ -47,7 +47,7 @@ public class AdminController {
     }
 
 
-    @GetMapping("/query")
+    @PostMapping("/query")
     public ResponseEntity<?> runQuery(
             @RequestBody QueryRequestDTO dto){
 
