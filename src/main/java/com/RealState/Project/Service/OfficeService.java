@@ -16,5 +16,5 @@ public interface OfficeService {
 
     List<ListingDTO> getListings();
 
-    List<TopAgentDTO> getTopAgents();
+    List<AgentSummaryDTO> getTopAgents();
 }

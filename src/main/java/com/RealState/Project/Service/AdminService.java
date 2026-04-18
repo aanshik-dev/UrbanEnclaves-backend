@@ -1,6 +1,7 @@
 package com.RealState.Project.Service;
 
 import com.RealState.Project.DTO.Admin.*;
+import com.RealState.Project.DTO.AgentSummaryDTO;
 
 import java.util.List;
 
@@ -18,5 +19,5 @@ public interface AdminService {
 
     TransactionAnalyticsDTO getDealsAnalytics();
 
-    List<TopAgentDTO> getTopAgents();
+    List<AgentSummaryDTO> getTopAgents();
 }

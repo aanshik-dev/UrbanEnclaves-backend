@@ -1,5 +1,6 @@
 package com.RealState.Project.Repository;
 
+import com.RealState.Project.DTO.AgentSummaryDTO;
 import com.RealState.Project.DTO.RevenuePointDTO;
 import com.RealState.Project.Entity.Agent;
 import com.RealState.Project.Entity.Office;
@@ -82,15 +83,63 @@ public interface TransactionRepository
 
 
     @Query("""
-    SELECT t.agent.id ,
-           t.agent.user.userProfile.name ,
-           COUNT(t),
-           COALESCE(SUM(t.amount),0)
-    FROM Transaction t
-    GROUP BY t.agent.id , t.agent.user.userProfile.name
-    ORDER BY SUM(t.amount) DESC
-    """)
-    List<Object[]> topAgents(Pageable pageable);
+SELECT a FROM Agent a 
+LEFT JOIN ListingToken l 
+ON l.agent = a AND l.status = com.RealState.Project.Entity.Type.Status.ACTIVE
+WHERE a.office = :office
+GROUP BY a
+ORDER BY COUNT(l) ASC
+""")
+    List<Agent> findLeastBusyAgent(Office office);
+
+
+    @Query("""
+SELECT new com.RealState.Project.DTO.AgentSummaryDTO(
+    a.id,
+    up.name,
+    COUNT(t.tid),
+    p.score,
+    up.phone,
+    a.status,
+    p.user_rating
+)
+FROM Transaction t
+JOIN t.agent a
+JOIN a.user u
+JOIN u.userProfile up
+LEFT JOIN Performance p ON p.agent = a
+GROUP BY a.id, up.name, p.score, up.phone, a.status, p.user_rating
+ORDER BY SUM(t.amount) DESC
+""")
+    List<AgentSummaryDTO> topAgents(Pageable pageable);
+
+
+
+    @Query("""
+SELECT new com.RealState.Project.DTO.AgentSummaryDTO(
+    a.id,
+    up.name,
+    COUNT(t.tid),
+    p.score,
+    up.phone,
+    a.status,
+    p.user_rating
+)
+FROM Transaction t
+JOIN t.agent a
+JOIN a.user u
+JOIN u.userProfile up
+LEFT JOIN Performance p ON p.agent = a
+JOIN a.office o
+WHERE o.id = :officeId
+GROUP BY a.id, up.name, p.score, up.phone, a.status, p.user_rating
+ORDER BY SUM(t.amount) DESC
+""")
+    List<AgentSummaryDTO> topAgentsByOffice(
+            @Param("officeId") Long officeId,
+            Pageable pageable
+    );
+
 
     @Query("""
            SELECT COALESCE(SUM(t.amount),0)
@@ -448,24 +497,7 @@ ORDER BY t.amount DESC
     boolean existsByToken_Id(Long listingId);
 
 
-    @Query("""
-SELECT 
-    a.id,
-    u.username,
-    COUNT(t.id),
-    SUM(t.amount * 1.0)
-FROM Transaction t
-JOIN t.agent a
-JOIN a.user u
-JOIN a.office o
-WHERE o.id = :officeId
-GROUP BY a.id, u.username
-ORDER BY SUM(t.amount) DESC
-""")
-    List<Object[]> topAgentsByOffice(
-            @Param("officeId") Long officeId,
-            Pageable pageable
-    );
+
 }
 
 

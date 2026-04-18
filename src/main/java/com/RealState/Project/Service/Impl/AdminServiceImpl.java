@@ -1,6 +1,7 @@
 package com.RealState.Project.Service.Impl;
 
 import com.RealState.Project.DTO.Admin.*;
+import com.RealState.Project.DTO.AgentSummaryDTO;
 import com.RealState.Project.DTO.RecentTransactionsDTO;
 import com.RealState.Project.Entity.Agent;
 import com.RealState.Project.Entity.Transaction;
@@ -69,7 +70,7 @@ public class AdminServiceImpl implements AdminService {
                 .activeInSold(activeInSold)
                 .activeInRent(activeInRent)
 
-                .agents(agentRepository.getAllAgentsSummary())
+                .agents(transactionRepository.topAgents(pageable))
                 .recentTransactions(recent)
                 .totalRevenue(transactionRepository.totalRevenue())
                 .build();
@@ -173,19 +174,11 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<TopAgentDTO> getTopAgents() {
+    public List<AgentSummaryDTO> getTopAgents() {
 
-        List<Object[]> data =
-                transactionRepository.topAgents(PageRequest.of(0,5));
-
-        return data.stream()
-                .map(obj -> new TopAgentDTO(
-                        (Long) obj[0],
-                        (String) obj[1],
-                        (Long) obj[2],
-                        (Double) obj[3]
-                ))
-                .toList();
+        return transactionRepository.topAgents(
+                PageRequest.of(0,5)
+        );
     }
 
 
