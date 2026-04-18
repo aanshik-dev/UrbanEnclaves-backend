@@ -141,7 +141,7 @@ public class OfficeServiceImpl implements OfficeService {
                 .stream()
                 .map(agent -> AgentSummaryDTO.builder()
                         .agentId(agent.getId())
-                        .username(agent.getUser().getUsername())
+                        .name(agent.getUser().getUsername())
                         .phone(agent.getUser().getUserProfile().getPhone())
                         .status(agent.getStatus())
                         .rating(0.0f) // temporary until rating implemented
@@ -184,32 +184,20 @@ public class OfficeServiceImpl implements OfficeService {
     }
 
     @Override
-    public List<TopAgentDTO> getTopAgents() {
+    public List<AgentSummaryDTO> getTopAgents() {
 
         User user = securityUtil.getCurrentUser();
 
-        // ✅ Restrict to OFFICE only
         if(user.getUserProfile().getUserType() != UserType.OFFICE){
-            throw new RuntimeException("Only office can access this API");
+            throw new RuntimeException("Only office can access");
         }
 
-        // ✅ officeId = userId (because of @MapsId)
         Long officeId = user.getId();
 
-        List<Object[]> data =
-                transactionRepository.topAgentsByOffice(
-                        officeId,
-                        PageRequest.of(0, 5)
-                );
-
-        return data.stream()
-                .map(obj -> new TopAgentDTO(
-                        (Long) obj[0],
-                        (String) obj[1],
-                        (Long) obj[2],
-                        (Double) obj[3]
-                ))
-                .toList();
+        return transactionRepository.topAgentsByOffice(
+                officeId,
+                PageRequest.of(0,5)
+        );
     }
 }
 

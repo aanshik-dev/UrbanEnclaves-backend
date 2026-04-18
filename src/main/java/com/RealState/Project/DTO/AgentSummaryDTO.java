@@ -9,10 +9,11 @@ import org.hibernate.query.sql.internal.ParameterRecognizerImpl;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+
 public class AgentSummaryDTO {
 
     private Long agentId;
-    private String username;
+    private String name;   //profile name
     private Float totalDeals;
     private Float score;
     private Long phone;
@@ -21,7 +22,7 @@ public class AgentSummaryDTO {
 
     public AgentSummaryDTO(
             Long agentId,
-            String username,
+            String name,
             Integer totalDeals,
             Float score,
             Long phone,
@@ -29,7 +30,7 @@ public class AgentSummaryDTO {
             Float rating
     ){
         this.agentId = agentId;
-        this.username = username;
+        this.name = name;
         this.totalDeals = totalDeals != null ? totalDeals.floatValue() : 0;
         this.score = score;
         this.phone = phone;
@@ -37,4 +38,21 @@ public class AgentSummaryDTO {
         this.rating = rating;
     }
 
+    public AgentSummaryDTO(
+            Long agentId,
+            String name,
+            Long totalDeals,
+            Float score,
+            Long phone,
+            Status status,
+            Float rating
+    ){
+        this.agentId = agentId;
+        this.name = name;
+        this.totalDeals = totalDeals != null ? totalDeals.floatValue() : 0;
+        this.score = score;
+        this.phone = phone;
+        this.status = status;
+        this.rating = rating;
+    }
 }
