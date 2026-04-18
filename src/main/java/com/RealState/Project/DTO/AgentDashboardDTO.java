@@ -25,8 +25,8 @@ public class AgentDashboardDTO {
     private Double monthlyCommission;
 
     // performance
-    private Double rating;
-    private Double performanceScore;
+    private float rating;
+    private float performanceScore;
 
     // averages
     private Double avgDealValue;

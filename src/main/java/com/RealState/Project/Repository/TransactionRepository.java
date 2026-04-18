@@ -97,43 +97,38 @@ ORDER BY COUNT(l) ASC
 SELECT new com.RealState.Project.DTO.AgentSummaryDTO(
     a.id,
     up.name,
-    COUNT(t.tid),
+    p.total_deals,
     p.score,
     up.phone,
     a.status,
     p.user_rating
 )
-FROM Transaction t
-JOIN t.agent a
+FROM Agent a
 JOIN a.user u
 JOIN u.userProfile up
-LEFT JOIN Performance p ON p.agent = a
-GROUP BY a.id, up.name, p.score, up.phone, a.status, p.user_rating
-ORDER BY SUM(t.amount) DESC
+JOIN Performance p ON p.agent = a
+ORDER BY p.score DESC, p.user_rating DESC
 """)
     List<AgentSummaryDTO> topAgents(Pageable pageable);
-
 
 
     @Query("""
 SELECT new com.RealState.Project.DTO.AgentSummaryDTO(
     a.id,
     up.name,
-    COUNT(t.tid),
+    p.total_deals,
     p.score,
     up.phone,
     a.status,
     p.user_rating
 )
-FROM Transaction t
-JOIN t.agent a
+FROM Agent a
 JOIN a.user u
 JOIN u.userProfile up
-LEFT JOIN Performance p ON p.agent = a
+JOIN Performance p ON p.agent = a
 JOIN a.office o
 WHERE o.id = :officeId
-GROUP BY a.id, up.name, p.score, up.phone, a.status, p.user_rating
-ORDER BY SUM(t.amount) DESC
+ORDER BY p.score DESC, p.user_rating DESC
 """)
     List<AgentSummaryDTO> topAgentsByOffice(
             @Param("officeId") Long officeId,

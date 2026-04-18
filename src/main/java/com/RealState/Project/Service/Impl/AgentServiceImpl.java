@@ -120,11 +120,25 @@ public class AgentServiceImpl implements AgentService {
                         (double) totalDeals / totalListings * 100;
 
 
+        Performance performance =
+                performanceRepository.findById(agent.getId())
+                        .orElse(null);
+
+        Float rating = 0f;
+        Float performanceScore = 0f;
+
+        if(performance != null){
+            rating = performance.getUser_rating();
+            performanceScore = performance.getScore();
+        }
+
+
         return AgentDashboardDTO.builder()
                 .totalListings(totalListings)
                 .activeListings(activeListings)
                 .soldListings(soldListings)
-
+                .rating(rating)
+                .performanceScore(performanceScore)
                 .totalDeals(totalDeals)
                 .dealsThisMonth(monthlyDeals)
 
