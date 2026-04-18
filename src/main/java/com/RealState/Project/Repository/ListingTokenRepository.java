@@ -88,7 +88,7 @@ public interface ListingTokenRepository extends JpaRepository<ListingToken,Long>
             JOIN FETCH l.pid p
             JOIN FETCH p.owner o
             JOIN FETCH o.userProfile
-            WHERE l.status = 'INACTIVE'
+            WHERE l.status = 'ACTIVE'
             AND l.agent IS NULL
             """)
     List<ListingToken> findAvailableListings();

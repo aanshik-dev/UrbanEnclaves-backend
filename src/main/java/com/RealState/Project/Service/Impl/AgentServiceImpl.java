@@ -78,6 +78,8 @@ public class AgentServiceImpl implements AgentService {
 
         Agent agent = getCurrentAgent();
 
+        System.out.println(agent.getId());
+
         LocalDate monthStart = LocalDate.now().withDayOfMonth(1);
 
         Long totalListings =
@@ -121,14 +123,18 @@ public class AgentServiceImpl implements AgentService {
 
 
         Performance performance =
-                performanceRepository.findById(agent.getId())
+                performanceRepository.findByAgent(agent)
                         .orElse(null);
 
         Float rating = 0f;
         Float performanceScore = 0f;
 
         if(performance != null){
+            System.out.println(performance.getAgent().getId());
+
             rating = performance.getUser_rating();
+            System.out.println(rating);
+
             performanceScore = performance.getScore();
         }
 

@@ -28,5 +28,6 @@ public class PropertyResponseDTO {
     private OfficeForOtherTableResponseDTO office;
 
     private List<ImageDTO> images;
+    
 
 }

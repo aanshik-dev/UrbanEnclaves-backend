@@ -184,7 +184,7 @@ public class ListingPropertyServiceImpl implements ListingPropertyServices {
         listing.setAgent(agent);
 
         // activate listing
-        listing.setStatus(Status.ACTIVE);
+//        listing.setStatus(Status.ACTIVE);
 
         ListingToken saved = listingTokenRepository.save(listing);
 
