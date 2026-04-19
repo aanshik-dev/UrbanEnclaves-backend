@@ -57,7 +57,7 @@ public class ListingPropertyServiceImpl implements ListingPropertyServices {
                 .listingType(request.getListingType())
                 .price(request.getPrice())
                 .description(request.getDescription())
-                .status(Status.INACTIVE)   // 🔥 IMPORTANT CHANGE
+                .status(Status.ACTIVE)   // 🔥 IMPORTANT CHANGE
                 .pid(property)
                 .agent(null)               // 🔥 NO AGENT
                 .build();
@@ -229,7 +229,7 @@ public class ListingPropertyServiceImpl implements ListingPropertyServices {
         listing.setAgent(null);
 
         // Update status
-        listing.setStatus(Status.INACTIVE); // or AVAILABLE (your choice)
+//        listing.setStatus(Status.INACTIVE); // or AVAILABLE (your choice)
 
         ListingToken saved = listingTokenRepository.save(listing);
 
