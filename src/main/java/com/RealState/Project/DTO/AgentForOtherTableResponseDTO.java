@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class AgentForOtherTableResponseDTO {
-
+   private Long agentId;
     private String name;
     private String phone;
     private String profileUrl;

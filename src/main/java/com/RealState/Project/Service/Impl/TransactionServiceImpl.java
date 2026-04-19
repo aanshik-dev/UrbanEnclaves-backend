@@ -48,6 +48,14 @@ public class TransactionServiceImpl implements TransactionService {
 
         Property property = token.getPid();
 
+        User owner = property.getOwner();
+
+        if(owner.getId().equals(buyer.getId())){
+            throw new RuntimeException(
+                    "Buyer cannot purchase their own property"
+            );
+        }
+
         Transaction transaction = Transaction.builder()
                 .amount(request.getAmount())
                 .type(request.getType())
@@ -130,6 +138,7 @@ public class TransactionServiceImpl implements TransactionService {
         // ---------- Agent ----------
         AgentForOtherTableResponseDTO agentDTO =
                 new AgentForOtherTableResponseDTO(
+                        t.getAgent().getId(),
                         t.getAgent().getUser().getUserProfile().getName(),
                         String.valueOf(
                                 t.getAgent().getUser().getUserProfile().getPhone()

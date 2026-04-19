@@ -303,6 +303,7 @@ public class ListingPropertyServiceImpl implements ListingPropertyServices {
             }
 
             agentDTO = AgentForOtherTableResponseDTO.builder()
+                    .agentId(agent.getId())
                     .name(profile.getName())
                     .phone(String.valueOf(profile.getPhone()))
                     .profileUrl(profile.getProfileURL())
