@@ -3,7 +3,9 @@ package com.RealState.Project.Service;
 import com.RealState.Project.DTO.ListingTokenDTO;
 import com.RealState.Project.DTO.ListingTokenRequestDTO;
 import com.RealState.Project.DTO.ListingTokenResponseDTO;
+import com.RealState.Project.Utils.ApiResponse;
 import org.jspecify.annotations.Nullable;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -13,7 +15,7 @@ public interface ListingPropertyServices {
     ListingTokenResponseDTO createListingToken(ListingTokenRequestDTO listingTokenDTO);
     ListingTokenResponseDTO getListedPropertyById(Long listingTokenId);
     ListingTokenResponseDTO updateListingPropertyByID(Long tokenId,ListingTokenRequestDTO listingTokenDTO);
-    void  deleteListingPropertyById(Long listingTokenId);
+    ResponseEntity<ApiResponse<?>> deleteListingPropertyById(Long listingTokenId);
     List<ListingTokenResponseDTO> getMyListings();
 
     List<ListingTokenResponseDTO> getAvailableListingsForAgent();

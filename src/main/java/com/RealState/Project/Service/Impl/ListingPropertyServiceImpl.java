@@ -10,8 +10,10 @@ import com.RealState.Project.Repository.*;
 import com.RealState.Project.Service.ListingPropertyServices;
 import com.RealState.Project.Strategy.Listing.ListingAccessStrategy;
 import com.RealState.Project.Strategy.Listing.ListingStrategyFactory;
+import com.RealState.Project.Utils.ApiResponse;
 import com.RealState.Project.Utils.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -57,7 +59,7 @@ public class ListingPropertyServiceImpl implements ListingPropertyServices {
                 .listingType(request.getListingType())
                 .price(request.getPrice())
                 .description(request.getDescription())
-                .status(Status.INACTIVE)   // 🔥 IMPORTANT CHANGE
+                .status(Status.ACTIVE)   // 🔥 IMPORTANT CHANGE
                 .pid(property)
                 .agent(null)               // 🔥 NO AGENT
                 .build();
@@ -107,21 +109,35 @@ public class ListingPropertyServiceImpl implements ListingPropertyServices {
     }
 
     @Override
-    public void deleteListingPropertyById(Long listingId){
+    public ResponseEntity<ApiResponse<?>> deleteListingPropertyById(Long listingId) {
 
-        ListingToken listing = listingTokenRepository.findById(listingId)
-                .orElseThrow(() -> new RuntimeException("Listing not found"));
+        ListingToken listing =
+                listingTokenRepository.findById(listingId)
+                        .orElseThrow(() ->
+                                new RuntimeException("Listing not found")
+                        );
 
+        User currentUser =
+                securityUtil.getCurrentUser();
 
-        User currentUser = securityUtil.getCurrentUser();
-        User owner = listing.getPid().getOwner();
+        User owner =
+                listing.getPid().getOwner();
 
-
-        if(!owner.getId().equals(currentUser.getId())){
-            throw new RuntimeException("You are not authorized to delete this listing");
+        if (!owner.getId().equals(currentUser.getId())) {
+            throw new RuntimeException(
+                    "You are not authorized to delete this listing"
+            );
         }
 
-        listingTokenRepository.delete(listing);
+        listing.setStatus(Status.INACTIVE);
+
+        listingTokenRepository.save(listing);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "Listing deleted successfully"
+                )
+        );
     }
 
     @Override
@@ -229,7 +245,7 @@ public class ListingPropertyServiceImpl implements ListingPropertyServices {
         listing.setAgent(null);
 
         // Update status
-        listing.setStatus(Status.INACTIVE); // or AVAILABLE (your choice)
+//        listing.setStatus(Status.INACTIVE); // or AVAILABLE (your choice)
 
         ListingToken saved = listingTokenRepository.save(listing);
 
@@ -276,6 +292,7 @@ public class ListingPropertyServiceImpl implements ListingPropertyServices {
             User user = agent.getUser();
             UserProfile profile = user.getUserProfile();
 
+
             String rating = "0";
 
             Performance performance =
@@ -290,6 +307,7 @@ public class ListingPropertyServiceImpl implements ListingPropertyServices {
                     .phone(String.valueOf(profile.getPhone()))
                     .profileUrl(profile.getProfileURL())
                     .userRating(rating)
+                    .commissionRate(agent.getCommissionRate())
                     .build();
         }
 
@@ -302,7 +320,7 @@ public class ListingPropertyServiceImpl implements ListingPropertyServices {
                 .description(listing.getDescription())
                 .status(listing.getStatus())
                 .property(propertyDTO)
-                .owner(ownerDTO)   // 🔥 NEW
+                .owner(ownerDTO)   //
                 .agent(agentDTO)
                 .build();
     }

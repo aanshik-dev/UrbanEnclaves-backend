@@ -28,11 +28,12 @@ public class AgentDashboardDTO {
     private float rating;
     private float performanceScore;
 
+
     // averages
     private Double avgDealValue;
-    private Double conversionRate;
+    private Float commissionRate;
 
 
-    private PropertyForOtherTableResponseDTO bestPropertySold;
+    private AgentBestPropertyDTO bestPropertySold;
 
 }

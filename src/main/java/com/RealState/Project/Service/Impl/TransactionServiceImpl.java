@@ -5,11 +5,10 @@ import com.RealState.Project.DTO.TransactionDTO;
 import com.RealState.Project.DTO.*;
 import com.RealState.Project.DTO.TransactionRequestDTO;
 import com.RealState.Project.Entity.*;
+import com.RealState.Project.Entity.Type.Listing_type;
+import com.RealState.Project.Entity.Type.Status;
 import com.RealState.Project.Mapper.TransactionMapper;
-import com.RealState.Project.Repository.AgentRepository;
-import com.RealState.Project.Repository.ListingTokenRepository;
-import com.RealState.Project.Repository.TransactionRepository;
-import com.RealState.Project.Repository.UserRepository;
+import com.RealState.Project.Repository.*;
 import com.RealState.Project.Service.TransactionService;
 import com.RealState.Project.Strategy.Transaction.TransactionAccessStrategy;
 import com.RealState.Project.Strategy.Transaction.TransactionStrategyFactory;
@@ -28,18 +27,26 @@ public class TransactionServiceImpl implements TransactionService {
     private final ListingTokenRepository listingTokenRepository;
     public final SecurityUtil securityUtil;
     private final TransactionStrategyFactory strategyFactory;
+    private final PropertyRepository propertyRepository;
 
     @Override
-    public TransactionDecrriptionDTO createTransaction(TransactionRequestDTO request) {
+    public TransactionDecrriptionDTO createTransaction(
+            TransactionRequestDTO request
+    ) {
 
         Agent agent = agentRepository.findById(request.getAgentId())
-                .orElseThrow(() -> new RuntimeException("Agent not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Agent not found"));
 
         User buyer = userRepository.findById(request.getBuyerId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
 
         ListingToken token = listingTokenRepository.findById(request.getTokenId())
-                .orElseThrow(() -> new RuntimeException("Token not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Token not found"));
+
+        Property property = token.getPid();
 
         Transaction transaction = Transaction.builder()
                 .amount(request.getAmount())
@@ -50,10 +57,38 @@ public class TransactionServiceImpl implements TransactionService {
                 .token(token)
                 .build();
 
-        return convertToDTO(transactionRepository.save(transaction));
-    }
+        Transaction saved =
+                transactionRepository.save(transaction);
 
+        // ===================================
+        // CHANGE OWNER ONLY FOR SELL
+        // ===================================
+        if(token.getListingType() == Listing_type.SELL){
+
+            property.setOwner(buyer);
+
+            propertyRepository.save(property);
+
+            token.setStatus(Status.INACTIVE);
+
+            listingTokenRepository.save(token);
+        }
+
+        // ===================================
+        // RENT CASE
+        // ===================================
+        if(token.getListingType() == Listing_type.RENT){
+
+            token.setStatus(Status.INACTIVE); // optional
+
+            listingTokenRepository.save(token);
+        }
+
+        return convertToDTO(saved);
+    }
     @Override
+
+
     public List<TransactionDTO> getTransactions() {
         User user = securityUtil.getCurrentUser();
 
@@ -100,7 +135,9 @@ public class TransactionServiceImpl implements TransactionService {
                                 t.getAgent().getUser().getUserProfile().getPhone()
                         ),
                         t.getAgent().getUser().getUserProfile().getProfileURL(),
-                        "4.5" // later from performance table
+                        "4.5",
+                        t.getAgent().getCommissionRate()// later from performance table
+
                 );
 
 

@@ -16,4 +16,5 @@ public class UserProfileRequestDTO {
     String area;
     String city;
     int pin;
+    private String userType;
 }
