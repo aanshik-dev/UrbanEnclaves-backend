@@ -3,6 +3,7 @@ package com.RealState.Project.Controller.PropertyController;
 import com.RealState.Project.DTO.PropertyRequestDTO;
 import com.RealState.Project.DTO.PropertyResponseDTO;
 import com.RealState.Project.Service.PropertyService;
+import com.RealState.Project.Utils.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,11 +44,10 @@ public class UserPropertyController {
     }
 
     @DeleteMapping("/{propertyId}")
-    public ResponseEntity<Void> deleteProperty(@PathVariable Long propertyId) {
+    public ResponseEntity<ApiResponse<?>> deleteProperty(@PathVariable Long propertyId) {
 
-        propertyService.deletePropertyByID(propertyId);
+        return propertyService.deletePropertyByID(propertyId);
 
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/me/properties")

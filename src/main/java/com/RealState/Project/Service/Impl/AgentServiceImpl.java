@@ -1,8 +1,6 @@
 package com.RealState.Project.Service.Impl;
 
-import com.RealState.Project.DTO.AgentDashboardDTO;
-import com.RealState.Project.DTO.AgentPerformanceDTO;
-import com.RealState.Project.DTO.PropertyForOtherTableResponseDTO;
+import com.RealState.Project.DTO.*;
 import com.RealState.Project.Entity.*;
 import com.RealState.Project.Entity.Type.Status;
 import com.RealState.Project.Entity.Type.UserType;
@@ -30,7 +28,7 @@ public class AgentServiceImpl implements AgentService {
     private final SecurityUtil securityUtil;
     private final PerformanceRepository performanceRepository;
 
-    private PropertyForOtherTableResponseDTO getBestPropertySold(Long agentId){
+    private AgentBestPropertyDTO getBestPropertySold(Long agentId){
 
         List<Transaction> transactions =
                 transactionRepository.findTopTransactionByAgent(agentId);
@@ -44,7 +42,7 @@ public class AgentServiceImpl implements AgentService {
         ListingToken listing = top.getToken();
         Property property = listing.getPid();
 
-        return new PropertyForOtherTableResponseDTO(
+        PropertyForOtherTableResponseDTO propertyDetail = new PropertyForOtherTableResponseDTO(
                 property.getId(),
                 property.getHouseNo(),
                 property.getDescription(),
@@ -55,6 +53,17 @@ public class AgentServiceImpl implements AgentService {
                 property.getSize(),
                 property.getType(),
                 property.getBHK()
+        );
+
+        ListingForOtherTableResponseDTO listingDetail =
+                ListingForOtherTableResponseDTO.builder()
+                        .listingPrice(listing.getPrice())
+                        .listingType(String.valueOf(listing.getListingType()))
+                        .build();
+
+        return new AgentBestPropertyDTO(
+                propertyDetail,
+                listingDetail
         );
     }
 
@@ -117,9 +126,7 @@ public class AgentServiceImpl implements AgentService {
                 totalDeals == 0 ? 0 : totalRevenue / totalDeals;
 
 
-        Double conversion =
-                totalListings == 0 ? 0 :
-                        (double) totalDeals / totalListings * 100;
+
 
 
         Performance performance =
@@ -155,7 +162,7 @@ public class AgentServiceImpl implements AgentService {
                 .monthlyCommission(monthlyCommission)
 
                 .avgDealValue(avgDeal)
-                .conversionRate(conversion)
+                .commissionRate(agent.getCommissionRate())
                 .bestPropertySold(getBestPropertySold(agent.getId()))
 
                 .build();

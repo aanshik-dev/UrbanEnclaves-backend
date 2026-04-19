@@ -92,4 +92,10 @@ public interface ListingTokenRepository extends JpaRepository<ListingToken,Long>
             AND l.agent IS NULL
             """)
     List<ListingToken> findAvailableListings();
+
+    List<ListingToken> findByAgentAndStatus(Agent agent, Status status);
+
+    List<ListingToken> findListingsInTransactionsByAgent(Agent agent);
+
+    ListingToken findByPid(Property property);
 }

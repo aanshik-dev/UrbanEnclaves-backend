@@ -15,4 +15,5 @@ public class AgentForOtherTableResponseDTO {
     private String phone;
     private String profileUrl;
     private String userRating;
+    private double commissionRate;
 }

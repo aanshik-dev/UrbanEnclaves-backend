@@ -2,16 +2,16 @@ package com.RealState.Project.Service.Impl;
 
 import com.RealState.Project.DTO.*;
 import com.RealState.Project.Entity.*;
+import com.RealState.Project.Entity.Type.Status;
 import com.RealState.Project.Entity.Type.UserType;
-import com.RealState.Project.Repository.AgentRepository;
-import com.RealState.Project.Repository.OfficeRepository;
-import com.RealState.Project.Repository.PropertyRepository;
-import com.RealState.Project.Repository.UserRepository;
+import com.RealState.Project.Repository.*;
 import com.RealState.Project.Service.PropertyService;
 import com.RealState.Project.Strategy.Property.PropertyAccessStrategy;
 import com.RealState.Project.Strategy.Property.PropertyStrategyFactory;
+import com.RealState.Project.Utils.ApiResponse;
 import com.RealState.Project.Utils.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +26,7 @@ public class PropertyServiceImpl implements PropertyService {
     private final SecurityUtil securityUtil;
     private final AgentRepository agentRepository;
     private final PropertyStrategyFactory propertyStrategyFactory;
+    private  final ListingTokenRepository listingTokenRepository;
 
     @Override
     public PropertyResponseDTO addProperty(PropertyRequestDTO request){
@@ -98,7 +99,7 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public void deletePropertyByID(Long id) {
+    public ResponseEntity<ApiResponse<?>> deletePropertyByID(Long id) {
 
         Property property = propertyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Property not found"));
@@ -111,7 +112,20 @@ public class PropertyServiceImpl implements PropertyService {
             throw new RuntimeException("You are not authorized to delete this property");
         }
 
+        ListingToken listing =listingTokenRepository.findByPid(property);
+
+        if(listing!=null){
+            throw new RuntimeException("A listing is related to this property so it cannot be deleted ");
+        }
+
         propertyRepository.delete(property);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "Property deleted successfully"
+                )
+        );
+
     }
 
     // get property corresponding to ID

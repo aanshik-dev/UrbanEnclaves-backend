@@ -8,6 +8,7 @@ import com.RealState.Project.DTO.PropertyResponseDTO;
 import com.RealState.Project.Entity.ListingToken;
 import com.RealState.Project.Service.ListingPropertyServices;
 import com.RealState.Project.Service.PropertyService;
+import com.RealState.Project.Utils.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +49,7 @@ public class ListingTokenController {
     }
 
     @DeleteMapping("/{listingId}")
-    public ResponseEntity<Void> deleteListingProperties(
+    public ResponseEntity<ApiResponse<?>> deleteListingProperties(
             @PathVariable Long listingId){
 
         listingPropertyServices.deleteListingPropertyById(listingId);
