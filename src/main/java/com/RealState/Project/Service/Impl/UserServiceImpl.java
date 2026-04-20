@@ -109,95 +109,28 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("User is deleted");
         }
 
+
+        // PROFILE MUST ALREADY EXIST
+        // (created during signup)
+
         UserProfile profile = user.getUserProfile();
 
-        // =====================================
-        // DEFAULT USER TYPE
-        // =====================================
-        UserType requestedType = UserType.USER;
-
-        if (dto.getUserType() != null &&
-                !dto.getUserType().isBlank()) {
-
-            requestedType =
-                    UserType.valueOf(
-                            dto.getUserType()
-                                    .toUpperCase()
-                    );
-        }
-
-        // =====================================
-        // CREATE PROFILE
-        // =====================================
         if (profile == null) {
-
-            profile = UserProfile.builder()
-                    .user(user)
-                    .name(dto.getName())
-                    .phone(dto.getPhone())
-                    .profileURL(dto.getProfileURL())
-                    .area(dto.getArea())
-                    .city(dto.getCity())
-                    .pin(dto.getPin())
-                    .userType(requestedType)
-                    .build();
-
-        } else {
-
-            // =====================================
-            // UPDATE ONLY DTO FIELDS
-            // =====================================
-            profile.setName(dto.getName());
-            profile.setPhone(dto.getPhone());
-            profile.setProfileURL(dto.getProfileURL());
-            profile.setArea(dto.getArea());
-            profile.setCity(dto.getCity());
-            profile.setPin(dto.getPin());
-
-            if (dto.getUserType() != null &&
-                    !dto.getUserType().isBlank()) {
-
-                profile.setUserType(requestedType);
-            }
+            throw new RuntimeException(
+                    "Profile not found"
+            );
         }
+
+
+        // UPDATE ONLY EDITABLE FIELDS
+        profile.setName(dto.getName());
+        profile.setPhone(dto.getPhone());
+        profile.setProfileURL(dto.getProfileURL());
+        profile.setArea(dto.getArea());
+        profile.setCity(dto.getCity());
+        profile.setPin(dto.getPin());
 
         profile = userProfileRepository.save(profile);
-
-        // =====================================
-        // CREATE AGENT ROW IF TYPE = AGENT
-        // =====================================
-        if (profile.getUserType() == UserType.AGENT &&
-                !agentRepository.existsById(user.getId())) {
-
-            List<Office> offices =
-                    officeRepository.findAll();
-
-            if (offices.isEmpty()) {
-                throw new RuntimeException(
-                        "No office available"
-                );
-            }
-
-            Office randomOffice =
-                    offices.get(
-                            new Random().nextInt(
-                                    offices.size()
-                            )
-                    );
-
-            Agent agent = Agent.builder()
-                    .user(user)
-                    .commissionRate(2.5f)
-                    .licenceNumber(
-                            "LIC-" + user.getId()
-                    )
-                    .experience(0)
-                    .status(Status.ACTIVE)
-                    .office(randomOffice)
-                    .build();
-
-            agentRepository.save(agent);
-        }
 
         return UserProfileResponseDTO.builder()
 
@@ -216,7 +149,7 @@ public class UserServiceImpl implements UserService {
                 .pin(profile.getPin())
 
                 .regDate(profile.getRegDate())
-                .userType(profile.getUserType().name())
+                .userType(profile.getUserType().toString())
 
                 .build();
     }

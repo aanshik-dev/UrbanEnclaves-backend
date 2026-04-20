@@ -1,12 +1,12 @@
 package com.RealState.Project.Security;
 
 import com.RealState.Project.DTO.Auth.*;
-import com.RealState.Project.Entity.RefreshToken;
+import com.RealState.Project.Entity.*;
 import com.RealState.Project.Entity.Type.AuthProviderType;
-import com.RealState.Project.Entity.User;
+import com.RealState.Project.Entity.Type.Status;
+import com.RealState.Project.Entity.Type.UserType;
 import com.RealState.Project.Exception.AccessDeniedException;
-import com.RealState.Project.Repository.RefreshTokenRepository;
-import com.RealState.Project.Repository.UserRepository;
+import com.RealState.Project.Repository.*;
 import com.RealState.Project.Service.OtpService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +16,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +32,9 @@ public class AuthService {
     private final OtpService otpService;
     public final RefreshTokenService refreshTokenService;
     public final RefreshTokenRepository refreshTokenRepository;
+    private final UserProfileRepository userProfileRepository;
+    private final AgentRepository agentRepository;
+    private final OfficeRepository officeRepository;
 
     private User signupInternal(SignupRequestDTO dto, AuthProviderType providerType, String providerId) {
         User user = userRepository.findByUsername(dto.getUsername()).orElse(null);
@@ -59,17 +66,108 @@ public class AuthService {
         otpService.sendOtp(email);
     }
 
+    @Transactional
     public SignupResponseDTO signup(SignupRequestDTO dto){
-        User user = userRepository.findByUsername(dto.getUsername()).orElse(null);
-        if(user !=null) throw new IllegalArgumentException("User already Exist");
 
-        boolean verified = otpService.verifyOtp(dto.getEmail(), dto.getOtp());
-        if(!verified)
-            throw new RuntimeException("Email not verified");
+        User user = userRepository
+                .findByUsername(dto.getUsername())
+                .orElse(null);
 
-        user = signupInternal(dto,AuthProviderType.EMAIL,null );
+        if(user != null){
+            throw new IllegalArgumentException(
+                    "User already exists"
+            );
+        }
 
-        return new SignupResponseDTO(user.getId(),user.getUsername());
+        boolean verified =
+                otpService.verifyOtp(
+                        dto.getEmail(),
+                        dto.getOtp()
+                );
+
+        if(!verified){
+            throw new RuntimeException(
+                    "Email not verified"
+            );
+        }
+
+        UserType requestedType =
+                UserType.valueOf(
+                        String.valueOf(dto.getUserType())
+                );
+
+        // only USER / AGENT allowed
+        if(requestedType != UserType.USER &&
+                requestedType != UserType.AGENT){
+
+            throw new RuntimeException(
+                    "Invalid signup role"
+            );
+        }
+
+        user = signupInternal(
+                dto,
+                AuthProviderType.EMAIL,
+                null
+        );
+
+
+        // CREATE PROFILE
+
+        UserProfile profile =
+                UserProfile.builder()
+                        .user(user)
+                        .name(dto.getUsername())
+                        .phone(0)
+                        .profileURL(null)
+                        .area("")
+                        .city("")
+                        .pin(0)
+                        .userType(requestedType)
+                        .build();
+
+        userProfileRepository.save(profile);
+
+
+        // IF AGENT CREATE AGENT ROW
+
+        if(requestedType == UserType.AGENT){
+
+            List<Office> offices =
+                    officeRepository.findAll();
+
+            if(offices.isEmpty()){
+                throw new RuntimeException(
+                        "No office available"
+                );
+            }
+
+            Office randomOffice =
+                    offices.get(
+                            new Random().nextInt(
+                                    offices.size()
+                            )
+                    );
+
+            Agent agent =
+                    Agent.builder()
+                            .user(user)
+                            .commissionRate(2.5f)
+                            .licenceNumber(
+                                    "LIC-" + user.getId()
+                            )
+                            .experience(0)
+                            .status(Status.ACTIVE)
+                            .office(randomOffice)
+                            .build();
+
+            agentRepository.save(agent);
+        }
+
+        return new SignupResponseDTO(
+                user.getId(),
+                user.getUsername()
+        );
     }
 
     public LoginResponseDTO login(LoginRequestDTO dto) {
@@ -79,6 +177,13 @@ public class AuthService {
         );
 
         User user = (User)authentication.getPrincipal();
+
+        if(user.getUserProfile() == null){
+            throw new RuntimeException(
+                    "Profile not found"
+            );
+        }
+
         if (user.getUserProfile().getUserType() != dto.getUserType()) {
             throw new AccessDeniedException(
                     "Invalid login type. You are not " + dto.getUserType()
@@ -126,7 +231,7 @@ public class AuthService {
             String username = authUtil.determineUsernameFromAuth2User(oAuth2User,registerId,providerId);
 
             user = signupInternal(
-                    new SignupRequestDTO(username , null , email,null),
+                    new SignupRequestDTO(username , null , email,null,null),
                     providerType,
                     providerId
             );
