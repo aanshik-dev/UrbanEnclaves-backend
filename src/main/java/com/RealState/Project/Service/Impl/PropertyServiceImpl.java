@@ -50,7 +50,7 @@ public class PropertyServiceImpl implements PropertyService {
                 .year_built(request.getYear_built())
                 .pin(request.getPin())
                 .office(office)
-                .description(request.getDesctiption())
+                .description(request.getDescription())
                 .owner(currentUser)
                 .build();
 
