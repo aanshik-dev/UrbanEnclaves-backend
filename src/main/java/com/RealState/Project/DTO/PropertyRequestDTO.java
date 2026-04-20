@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PropertyRequestDTO {
     private Property_type type;
-    private String desctiption;
+    private String description;
     private String houseNo;
     private String locality;
     private int BHK;
